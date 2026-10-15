@@ -1,0 +1,259 @@
+{
+  "water": {
+    "file": "/scene/water.webp",
+    "w": 1536,
+    "h": 1024
+  },
+  "boat": {
+    "file": "/scene/boat.webp",
+    "w": 1727,
+    "h": 463
+  },
+  "boatFront": {
+    "file": "/scene/boat-front.webp",
+    "w": 1727,
+    "h": 463
+  },
+  "reeds": [
+    {
+      "file": "/scene/reed-0.webp",
+      "w": 417,
+      "h": 721
+    },
+    {
+      "file": "/scene/reed-1.webp",
+      "w": 360,
+      "h": 479
+    },
+    {
+      "file": "/scene/reed-2.webp",
+      "w": 232,
+      "h": 312
+    }
+  ],
+  "pads": [
+    {
+      "file": "/scene/pad-0.webp",
+      "w": 444,
+      "h": 122
+    },
+    {
+      "file": "/scene/pad-1.webp",
+      "w": 290,
+      "h": 87
+    },
+    {
+      "file": "/scene/pad-2.webp",
+      "w": 199,
+      "h": 59
+    }
+  ],
+  "stones": [
+    {
+      "file": "/scene/stone-0.webp",
+      "w": 187,
+      "h": 94
+    },
+    {
+      "file": "/scene/stone-1.webp",
+      "w": 125,
+      "h": 61
+    }
+  ],
+  "heads": {
+    "happy": {
+      "file": "/scene/head-happy.webp",
+      "w": 460,
+      "h": 436
+    },
+    "blink": {
+      "file": "/scene/head-blink.webp",
+      "w": 460,
+      "h": 436
+    },
+    "worried": {
+      "file": "/scene/head-worried.webp",
+      "w": 460,
+      "h": 436
+    },
+    "surprised": {
+      "file": "/scene/head-surprised.webp",
+      "w": 460,
+      "h": 436
+    },
+    "straining": {
+      "file": "/scene/head-straining.webp",
+      "w": 460,
+      "h": 436
+    },
+    "delighted": {
+      "file": "/scene/head-delighted.webp",
+      "w": 460,
+      "h": 436
+    }
+  },
+  "eyes": {
+    "happy": {
+      "file": "/scene/eyes-happy.webp",
+      "left": [
+        141,
+        252.5,
+        28.5,
+        14
+      ],
+      "right": [
+        269,
+        252,
+        30.5,
+        13.5
+      ]
+    },
+    "blink": null,
+    "worried": {
+      "file": "/scene/eyes-worried.webp",
+      "left": [
+        140.5,
+        253.5,
+        28,
+        14
+      ],
+      "right": [
+        267.5,
+        252.5,
+        31,
+        14
+      ]
+    },
+    "surprised": {
+      "file": "/scene/eyes-surprised.webp",
+      "left": [
+        138.5,
+        255.5,
+        26,
+        21
+      ],
+      "right": [
+        264.5,
+        254.5,
+        32,
+        22
+      ]
+    },
+    "straining": null,
+    "delighted": null
+  },
+  "intro": {
+    "w": 512,
+    "h": 486
+  },
+  "torso": {
+    "file": "/scene/torso.webp",
+    "w": 531,
+    "h": 662
+  },
+  "neck": {
+    "file": "/scene/neck.webp",
+    "w": 200,
+    "h": 130
+  },
+  "armFar": {
+    "file": "/scene/arm-far.webp",
+    "w": 613,
+    "h": 530
+  },
+  "armNear": {
+    "file": "/scene/arm-near.webp",
+    "w": 624,
+    "h": 630
+  },
+  "catches": {
+    "mirror": {
+      "file": "/scene/catch-mirror.webp",
+      "w": 570,
+      "h": 1401
+    },
+    "box": {
+      "file": "/scene/catch-box.webp",
+      "w": 662,
+      "h": 605
+    },
+    "drawer": {
+      "file": "/scene/catch-drawer.webp",
+      "w": 660,
+      "h": 608
+    },
+    "bottle": {
+      "file": "/scene/catch-bottle.webp",
+      "w": 306,
+      "h": 891
+    },
+    "cork": {
+      "file": "/scene/catch-cork.webp",
+      "w": 224,
+      "h": 293
+    },
+    "note": {
+      "file": "/scene/catch-note.webp",
+      "w": 553,
+      "h": 702
+    },
+    "globe": {
+      "file": "/scene/catch-globe.webp",
+      "w": 1024,
+      "h": 512
+    }
+  },
+  "underwater": {
+    "file": "/scene/underwater.webp",
+    "w": 1536,
+    "h": 1024
+  },
+  "fish": [
+    {
+      "file": "/scene/fish-0.webp",
+      "w": 520,
+      "h": 274,
+      "kind": "koi"
+    },
+    {
+      "file": "/scene/fish-1.webp",
+      "w": 520,
+      "h": 274,
+      "kind": "koi"
+    },
+    {
+      "file": "/scene/fish-goldfish.webp",
+      "w": 520,
+      "h": 261,
+      "kind": "goldfish"
+    },
+    {
+      "file": "/scene/fish-bluegill.webp",
+      "w": 520,
+      "h": 319,
+      "kind": "bluegill"
+    }
+  ],
+  "libraryThumbs": {
+    "moro": {
+      "left": 0,
+      "top": 0.1,
+      "side": 1
+    },
+    "kika": {
+      "left": 0,
+      "top": 0.1,
+      "side": 1
+    },
+    "senk8": {
+      "left": 0.0125,
+      "top": 0.53,
+      "side": 0.475
+    },
+    "tin": {
+      "left": 0.15,
+      "top": 0.11,
+      "side": 0.725
+    }
+  }
+}

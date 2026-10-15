@@ -1,0 +1,1929 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #fff;
+  overflow: hidden;
+}
+
+.scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.scene[data-ready='true'] {
+  opacity: 1;
+}
+
+/* The opening: a cutout of his head flipping from face to face with a word for each, on a
+   page of the sketchbook that then parts along its middle. */
+.intro {
+  --ink: #4a1512;
+  --paper: #fbf5e4;
+  position: fixed;
+  inset: 0;
+  /* Over everything, the project library page included, until it parts. */
+  z-index: 12;
+  color: var(--ink);
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+}
+
+/* The same dotted paper the case studies are written on. Each half's dots are counted from
+   the line where the two meet, so the grid runs unbroken across it. */
+.intro__half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: radial-gradient(circle, rgba(74, 21, 18, 0.1) 1px, transparent 1.4px) 0 0 / 18px 18px, var(--paper);
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1) 0.14s;
+}
+
+.intro__half--top {
+  top: 0;
+  background-position: left bottom, 0 0;
+}
+
+.intro__half--bottom {
+  bottom: 0;
+  background-position: left top, 0 0;
+}
+
+/* The line that grows as things load. When the page parts, each half keeps half of it. */
+.intro__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  background: var(--ink);
+  transform: scaleX(var(--progress, 0));
+  transition: transform 0.4s ease;
+}
+
+.intro[data-state='leaving'] .intro__line {
+  opacity: 0;
+}
+
+.intro[data-state='leaving'] .intro__half--top {
+  border-bottom: 2px solid var(--ink);
+  box-shadow: 0 10px 0 rgba(74, 21, 18, 0.16);
+  transform: translateY(-102%);
+}
+
+.intro[data-state='leaving'] .intro__half--bottom {
+  border-top: 2px solid var(--ink);
+  transform: translateY(102%);
+}
+
+.intro__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vmin, 18px);
+  transition:
+    opacity 0.2s ease,
+    scale 0.2s ease;
+}
+
+.intro[data-state='leaving'] .intro__stage {
+  opacity: 0;
+  scale: 0.86;
+}
+
+.intro__column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 2vmin, 18px);
+}
+
+/* The two ways in. They hang below the name without pushing the cutout off the middle. */
+.intro__actions {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  width: max-content;
+  max-width: 92vw;
+  margin-top: clamp(18px, 4vmin, 34px);
+  translate: -50% 0;
+}
+
+.intro__actions .button {
+  color: inherit;
+  font-family: inherit;
+  font-size: clamp(15px, 2.3vmin, 18px);
+  cursor: pointer;
+}
+
+.intro__actions .button--quiet {
+  background: #fffdf6;
+}
+
+.intro__actions .button--quiet:hover {
+  background: #fff;
+}
+
+.intro__actions .button:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+/* On a phone the two choices stand one above the other, the same width. */
+@media (max-width: 600px) {
+  .intro__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .intro__actions .button {
+    text-align: center;
+  }
+}
+
+/* The cutout turns in depth, so whatever holds it needs a point of view. */
+.intro__head {
+  position: relative;
+  width: clamp(190px, 38vmin, 340px);
+  aspect-ratio: 512 / 486;
+  perspective: 900px;
+}
+
+/* The greeting arched over his head. It swings into place, and leaves when the words begin. */
+.intro__hello {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: var(--ink);
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  transform-origin: 50% 54%;
+  animation: intro-hello 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.25) 0.15s both;
+  transition:
+    opacity 0.2s ease,
+    scale 0.2s ease;
+}
+
+.intro__hello[data-gone='true'] {
+  opacity: 0;
+  scale: 1.08;
+}
+
+@keyframes intro-hello {
+  from {
+    opacity: 0;
+    rotate: -16deg;
+  }
+}
+
+/* A sticker cut from a photograph, casting the same flat shadow as everything else here. */
+.intro__card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(5px 7px 0 rgba(74, 21, 18, 0.26));
+  will-change: transform;
+}
+
+/* All six faces are stacked; they swap while the cutout is edge-on, so none is seen to. */
+.intro__card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.intro__card img[data-show='true'] {
+  opacity: 1;
+}
+
+.intro__word {
+  margin: 0;
+  font-size: clamp(26px, 5.4vmin, 58px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  animation: intro-word 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  transition:
+    opacity 0.14s ease,
+    translate 0.14s ease;
+}
+
+/* As the cutout turns away, its word goes with it; the next arrives as it comes round. */
+.intro__word[data-leaving='true'] {
+  opacity: 0;
+  translate: 0 -0.3em;
+}
+
+@keyframes intro-word {
+  from {
+    opacity: 0;
+    translate: 0 0.45em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro__half {
+    transition: opacity 0.4s ease;
+  }
+
+  .intro[data-state='leaving'] .intro__half {
+    opacity: 0;
+    transform: none;
+  }
+
+  .intro__card img {
+    transition: opacity 0.2s ease;
+  }
+
+  .intro__word,
+  .intro__hello {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Whose sketchbook it is, in the white of the page. */
+.masthead {
+  position: fixed;
+  left: clamp(18px, 4.5vw, 64px);
+  top: clamp(18px, 6vh, 56px);
+  max-width: min(440px, 62vw);
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.6s ease,
+    color 4s ease;
+}
+
+.masthead[data-visible='true'] {
+  opacity: 1;
+}
+
+.masthead :is(h1, .masthead__name) {
+  margin: 0;
+  font-size: clamp(30px, 4.2vw, 54px);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.masthead__line {
+  margin: 10px 0 0;
+  font-size: clamp(15px, 1.5vw, 19px);
+  font-weight: 600;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+/* After dark the name is written in the colour of moonlight. */
+html[data-mood='night'] .masthead {
+  color: #fbf5e4;
+}
+
+/* Things that belong to the surface, put away while the view is below it. */
+html[data-dive='true'] :is(.masthead, .tags, .pull, .open) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease;
+}
+
+/* To the project library: under the sound switch. */
+.to-library {
+  position: fixed;
+  right: clamp(12px, 2.5vw, 28px);
+  top: calc(clamp(12px, 3vh, 24px) + 44px);
+  z-index: 3;
+  padding: 7px 14px;
+  border: 2px solid #4a1512;
+  border-radius: 999px;
+  background: #f8f1dd;
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.28);
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.to-library[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.to-library:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* The project library, after the reference: a row of small pictures near the top and one
+   huge word across the middle that rolls over, letter by letter, into the name of whichever
+   project is pointed at. It is laid over the pond's own water, which the view dives into. */
+.plib {
+  --ink: #4a1512;
+  --cream: #fff8e6;
+  --accent: #ffe566;
+  /* The band the word shows in, as tall as its largest word (set once the word is measured),
+     and how far a letter travels to leave it. */
+  --band: min(30vw, 58vh);
+  --travel: calc(var(--band) * 1.45);
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* The water deepens a little behind the page, so the words stand out from it. */
+  background: radial-gradient(ellipse at 50% 55%, rgba(8, 36, 62, 0.12), rgba(6, 26, 46, 0.5));
+  color: var(--cream);
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  animation: plib-in 0.8s ease 0.45s both;
+}
+
+@keyframes plib-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.plib__back {
+  position: absolute;
+  left: clamp(14px, 3vw, 36px);
+  top: clamp(14px, 3vh, 28px);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px 10px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--cream);
+  box-shadow: 0 4px 0 var(--ink);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.plib__back:hover {
+  background: #fff1c9;
+}
+
+.plib__back:active {
+  translate: 0 3px;
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.plib__back:focus-visible,
+.plib__thumb:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* The row of pictures: small squares that make room for the one pointed at. */
+.plib__row {
+  position: absolute;
+  top: 10%;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  max-width: 90%;
+}
+
+.plib__thumb {
+  display: block;
+  width: 60px;
+  height: 60px;
+  padding: 5px;
+  border-radius: 12px;
+  transition:
+    width 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.plib__thumb[data-active='true'] {
+  width: 120px;
+  height: 120px;
+}
+
+.plib__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--cream);
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.45);
+  object-fit: cover;
+  user-select: none;
+}
+
+/* The round follower with its arrow, hanging just below the pointer over the row. */
+.plib__follower {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 5px 0 rgba(74, 21, 18, 0.45);
+  color: var(--ink);
+  pointer-events: none;
+  transform: scale(0);
+  transform-origin: left top;
+  transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.plib__row[data-pointing='true'] .plib__follower {
+  transform: scale(1);
+}
+
+/* The band the big word rolls through; a letter outside it is out of sight. */
+.plib__band {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: var(--band);
+  overflow: hidden;
+  /* On a short screen, moved down clear of the row of pictures. */
+  translate: 0 var(--band-shift, 0px);
+}
+
+.plib__word {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--cream);
+  font-size: min(28vw, 55vh);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0.035em 0 rgba(74, 21, 18, 0.35);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.plib__word[data-project='true'] {
+  color: var(--accent);
+}
+
+.plib__word span {
+  display: inline-block;
+  white-space: pre;
+  animation: 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--delay) both;
+}
+
+.plib__word[data-state='in'][data-from='below'] span {
+  animation-name: plib-rise-in;
+}
+
+.plib__word[data-state='in'][data-from='above'] span {
+  animation-name: plib-drop-in;
+}
+
+.plib__word[data-state='out'][data-from='below'] span {
+  animation-name: plib-rise-out;
+}
+
+.plib__word[data-state='out'][data-from='above'] span {
+  animation-name: plib-drop-out;
+}
+
+@keyframes plib-rise-in {
+  from {
+    transform: translateY(var(--travel));
+  }
+}
+
+@keyframes plib-drop-in {
+  from {
+    transform: translateY(calc(-1 * var(--travel)));
+  }
+}
+
+@keyframes plib-rise-out {
+  to {
+    transform: translateY(calc(-1 * var(--travel)));
+  }
+}
+
+@keyframes plib-drop-out {
+  to {
+    transform: translateY(var(--travel));
+  }
+}
+
+@media (max-width: 640px) {
+  .plib__thumb {
+    width: 50px;
+    height: 50px;
+    padding: 2.5px;
+  }
+
+  .plib__thumb[data-active='true'] {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+/* No follower without a pointer to follow. */
+@media (hover: none) {
+  .plib__follower {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plib__word span {
+    animation: none;
+  }
+
+  .plib__word[data-state='out'] {
+    display: none;
+  }
+
+  .plib__thumb,
+  .plib__follower {
+    transition: none;
+  }
+}
+
+/* The sound switch. Sound is off until the visitor asks for it. */
+.sound {
+  position: fixed;
+  right: clamp(12px, 2.5vw, 28px);
+  top: clamp(12px, 3vh, 24px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 2px solid #4a1512;
+  border-radius: 999px;
+  background: #f8f1dd;
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.28);
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sound[aria-pressed='true'] {
+  background: #ffe566;
+}
+
+.sound:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+.sound svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* The Project Library mark is only for phones; elsewhere the button says its name. */
+.to-library__icon {
+  display: none;
+}
+
+/* The phone homepage: two round icon controls side by side at the top, no name or tagline
+   or help line to crowd them, and a small glass pill inviting a swipe down into the water. */
+.swipe {
+  display: none;
+}
+
+/* Swipes on the pond and in the library belong to the page, not to the browser's own
+   scrolling, which would otherwise cancel them part way. */
+.scene,
+.plib {
+  touch-action: none;
+}
+
+/* Nothing in the library is picked up and dragged as an image: a drag is a swipe. */
+.plib img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+@media (max-width: 600px) {
+  .hint {
+    display: none;
+  }
+
+  /* The name and its line, small, in the top left corner, clear of the icons on the right. */
+  .masthead {
+    left: 16px;
+    top: max(16px, env(safe-area-inset-top));
+    max-width: calc(100vw - 92px);
+  }
+
+  .masthead :is(h1, .masthead__name) {
+    font-size: clamp(24px, 7.4vw, 30px);
+  }
+
+  .masthead__line {
+    margin-top: 4px;
+    max-width: 230px;
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .sound,
+  .to-library {
+    top: max(12px, env(safe-area-inset-top));
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  .sound {
+    right: 12px;
+  }
+
+  /* The library icon stands under the sound switch. */
+  .to-library {
+    right: 12px;
+    top: calc(max(12px, env(safe-area-inset-top)) + 54px);
+    display: flex;
+    align-items: center;
+  }
+
+  .sound svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .to-library__icon {
+    display: block;
+    width: 28px;
+    height: 28px;
+  }
+
+  /* The words stay for screen readers. */
+  .sound__label,
+  .to-library__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .swipe {
+    position: fixed;
+    left: 50%;
+    bottom: max(18px, calc(env(safe-area-inset-bottom) + 10px));
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 8px 14px 8px 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+      0 6px 18px rgba(8, 40, 70, 0.18);
+    -webkit-backdrop-filter: blur(14px) saturate(115%);
+    backdrop-filter: blur(14px) saturate(115%);
+    color: #fff;
+    font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(8, 40, 70, 0.35);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    translate: -50% 8px;
+    transition:
+      opacity 0.5s ease,
+      translate 0.5s ease;
+  }
+
+  .swipe[data-visible='true'] {
+    opacity: 1;
+    translate: -50% 0;
+    pointer-events: auto;
+  }
+
+  .swipe {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* A slow glint of light across the glass. */
+  .swipe::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.28) 50%, transparent 65%);
+    translate: -120% 0;
+    animation: swipe-glint 4.5s ease-in-out infinite;
+  }
+
+  .swipe svg {
+    width: 12px;
+    height: 12px;
+    animation: swipe-down 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes swipe-glint {
+  0%,
+  55% {
+    translate: -120% 0;
+  }
+
+  100% {
+    translate: 120% 0;
+  }
+}
+
+/* The arrow sinks, fades, and comes back: down into the water. */
+@keyframes swipe-down {
+  0% {
+    transform: translateY(-2px);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  70% {
+    transform: translateY(3px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(5px);
+    opacity: 0;
+  }
+}
+
+/* In the library on a phone: a tapped project opens out of its thumbnail into a large window,
+   with a liquid-glass button below it to its case study. */
+.plib__focus {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+}
+
+.plib__shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: rgba(6, 26, 46, 0.35);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+  animation: plib-shade-in 0.5s ease both;
+}
+
+.plib__focus[data-closing='true'] .plib__shade {
+  animation: plib-shade-out 0.45s ease both;
+}
+
+@keyframes plib-shade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes plib-shade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* The open project's name, rolled in letter by letter above its window. */
+.plib__title {
+  --travel: 1.15em;
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  margin: 0;
+  overflow: hidden;
+  color: var(--accent);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-shadow: 0 0.035em 0 rgba(74, 21, 18, 0.35);
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.plib__title span {
+  display: inline-block;
+  white-space: pre;
+  animation: plib-rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--delay) both;
+}
+
+/* What kind of work it is, under the window. */
+.plib__kind {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  margin: 0;
+  color: var(--cream);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(6, 30, 52, 0.45);
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: plib-fade-in 0.5s ease 0.45s both;
+  transition: opacity 0.25s ease;
+}
+
+.plib__focus[data-closing='true'] :is(.plib__title, .plib__kind, .plib__close) {
+  opacity: 0;
+}
+
+@keyframes plib-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* A small glass button at the window's corner to close it. */
+.plib__close {
+  position: fixed;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0 0 3px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 6px 18px rgba(6, 30, 52, 0.3);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: #fff;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  animation: plib-fade-in 0.4s ease 0.55s both;
+  transition:
+    background 0.2s ease,
+    opacity 0.25s ease;
+}
+
+.plib__close:hover,
+.plib__close:focus-visible {
+  background: rgba(255, 255, 255, 0.32);
+  outline: none;
+}
+
+.plib__window {
+  position: fixed;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  background: var(--cream);
+  box-shadow:
+    0 6px 0 rgba(74, 21, 18, 0.45),
+    0 24px 60px rgba(4, 20, 36, 0.45);
+  transform-origin: 0 0;
+}
+
+.plib__window img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The water it hangs in: a faint blue at its edges, and soft light drifting over it. */
+.plib__window::before,
+.plib__window::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.plib__window::before {
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 50px rgba(30, 110, 170, 0.32);
+}
+
+.plib__window::after {
+  inset: -40%;
+  z-index: 2;
+  background:
+    radial-gradient(ellipse 22% 12% at 30% 30%, rgba(255, 255, 255, 0.5), transparent 70%),
+    radial-gradient(ellipse 18% 10% at 66% 46%, rgba(255, 255, 255, 0.4), transparent 70%),
+    radial-gradient(ellipse 20% 11% at 42% 68%, rgba(255, 255, 255, 0.35), transparent 70%),
+    radial-gradient(ellipse 16% 9% at 74% 76%, rgba(255, 255, 255, 0.3), transparent 70%);
+  mix-blend-mode: soft-light;
+  opacity: 0.7;
+  animation: plib-caustics 11s ease-in-out infinite alternate;
+}
+
+@keyframes plib-caustics {
+  0% {
+    transform: translate(-6%, -4%) rotate(0deg);
+  }
+
+  50% {
+    transform: translate(5%, 3%) rotate(4deg);
+  }
+
+  100% {
+    transform: translate(-3%, 6%) rotate(-3deg);
+  }
+}
+
+/* The project the window came out of leaves its place in the row empty while it is open. */
+.plib__thumb[data-lifted='true'] img {
+  visibility: hidden;
+}
+
+/* While a window is open the row steps back, and returns as the window closes into it. */
+.plib__row {
+  transition: opacity 0.35s ease;
+}
+
+.plib[data-focus='true'] .plib__row {
+  opacity: 0;
+}
+
+.plib[data-focus='true'] .plib__band {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.plib__band {
+  transition: opacity 0.5s ease 0.15s;
+}
+
+.plib__case {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 14px));
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px 13px 26px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -10px 18px rgba(255, 255, 255, 0.06),
+    0 10px 30px rgba(6, 30, 52, 0.3);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-shadow: 0 1px 2px rgba(6, 30, 52, 0.4);
+  white-space: nowrap;
+  translate: -50% 0;
+  animation: plib-case-in 0.6s cubic-bezier(0.2, 0.9, 0.25, 1.15) 0.35s both;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* A brighter rim along its top edge, as glass catches light from above. */
+.plib__case::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent 45%);
+  pointer-events: none;
+}
+
+.plib__case span {
+  transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.plib__case:hover span,
+.plib__case:focus-visible span,
+.plib__case:active span {
+  transform: translateX(4px);
+}
+
+.plib__case::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.3) 50%, transparent 65%);
+  translate: -120% 0;
+  animation: swipe-glint 4.5s ease-in-out 1s infinite;
+}
+
+.plib__case:hover,
+.plib__case:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -10px 18px rgba(255, 255, 255, 0.1),
+    0 14px 36px rgba(6, 30, 52, 0.35);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.plib__case:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.plib__focus[data-closing='true'] .plib__case {
+  animation: plib-case-out 0.25s ease both;
+}
+
+@keyframes plib-case-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.94);
+  }
+}
+
+@keyframes plib-case-out {
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plib__shade,
+  .plib__case,
+  .plib__case::before,
+  .plib__title span,
+  .plib__kind,
+  .plib__close,
+  .plib__window::after {
+    animation: none;
+  }
+}
+
+/* On the narrowest phones the project tags are a little smaller, so the two in a row keep apart. */
+@media (max-width: 360px) {
+  .tag {
+    padding: 6px 10px 7px;
+  }
+
+  .tag__title {
+    font-size: 13.5px;
+  }
+
+  .tag__kind {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 600px) and (prefers-reduced-motion: reduce) {
+  .swipe::before,
+  .swipe svg {
+    animation: none;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Project tags: paper signs on the buoys. The layer itself lets the pointer through to
+   the water; only the tags catch it. */
+.tags {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.tags[data-ready='true'] {
+  opacity: 1;
+}
+
+.tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 100%;
+  pointer-events: auto;
+  display: grid;
+  gap: 2px;
+  padding: 7px 12px 8px;
+  border: 2px solid #4a1512;
+  border-radius: 4px;
+  background: #f8f1dd;
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.28);
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.tag__title {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.tag__kind {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.tag:hover,
+.tag:focus-visible {
+  background: #fff8e3;
+  box-shadow: 0 5px 0 rgba(74, 21, 18, 0.28);
+}
+
+.tag:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+.tag[aria-pressed='true'] {
+  background: #ffe566;
+}
+
+.tag[aria-disabled='true'] {
+  cursor: default;
+}
+
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  /* As wide as its words, up to the screen: centred from the middle, it would otherwise wrap at
+     half the screen's width. */
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+  margin: 0;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.hint[data-visible='true'] {
+  opacity: 1;
+}
+
+/* A tag whose project has been caught at least once carries a small mark. */
+.tag[data-seen='true']::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #4a1512;
+  border-radius: 50%;
+  background: #b9dc4e;
+}
+
+.pull {
+  position: fixed;
+  left: 0;
+  top: 0;
+  /* Placed by script at the float; this lifts it clear, above and centred. */
+  transform: translate(-50%, calc(-100% - 34px));
+  scale: 0.6;
+  padding: 14px 34px;
+  border: 3px solid #4a1512;
+  border-radius: 999px;
+  background: #ffe566;
+  box-shadow: 0 5px 0 #4a1512;
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    scale 0.25s cubic-bezier(0.3, 1.7, 0.5, 1);
+}
+
+.pull[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+  scale: 1;
+  animation: pull-nudge 0.9s ease-in-out infinite;
+}
+
+.pull:active {
+  box-shadow: 0 1px 0 #4a1512;
+}
+
+.pull:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 4px;
+}
+
+@keyframes pull-nudge {
+  50% {
+    scale: 1.07;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pull[data-visible='true'] {
+    animation: none;
+  }
+}
+
+/* The label on a catch in the boat: opens its case study. */
+.open {
+  position: fixed;
+  left: 0;
+  top: 0;
+  /* Placed by script at the top of the catch; this sets it just above, centred. */
+  transform: translate(-50%, calc(-100% - 10px));
+  scale: 0.6;
+  padding: 7px 16px 8px;
+  border: 2px solid #4a1512;
+  border-radius: 999px;
+  background: #ffe566;
+  box-shadow: 0 3px 0 #4a1512;
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    scale 0.25s cubic-bezier(0.3, 1.7, 0.5, 1);
+}
+
+.open[data-visible='true'] {
+  opacity: 1;
+  scale: 1;
+  pointer-events: auto;
+}
+
+.open:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+/* The case study: an open sketchbook laid over the middle of the scene, with the water
+   still showing all round it. The left page is the title page; the right page is the work. */
+.book {
+  --ink: #4a1512;
+  --paper: #fbf5e4;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(270px, 0.72fr) 1.28fr;
+  width: min(1180px, 92vw);
+  height: fit-content;
+  max-height: 88dvh;
+  margin: auto;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle, rgba(74, 21, 18, 0.1) 1px, transparent 1.4px) 0 0 / 18px 18px,
+    var(--paper);
+  box-shadow: 8px 10px 0 rgba(74, 21, 18, 0.28);
+  color: #2e1a17;
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.55;
+  animation: book-open 0.5s cubic-bezier(0.25, 1.3, 0.5, 1) both;
+}
+
+/* It opens from the middle of the page, like a book being spread flat. */
+@keyframes book-open {
+  from {
+    opacity: 0;
+    transform: scale(0.72, 0.9);
+  }
+  45% {
+    opacity: 1;
+  }
+}
+
+@keyframes book-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book {
+    animation: book-fade 0.2s ease both;
+  }
+}
+
+.book__title-page {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 26px 30px 30px;
+}
+
+.book__work {
+  position: relative;
+  /* Let it be as narrow as its column, whatever is inside. */
+  min-width: 0;
+  padding: 30px 34px 36px;
+  /* The fold down the middle of the book: a stitched line and a soft shadow beside it. */
+  border-left: 2px dashed rgba(74, 21, 18, 0.3);
+  background: linear-gradient(to right, rgba(74, 21, 18, 0.1), transparent 34px);
+}
+
+.book :is(h1, h2, .book__kind, .book__close, .button, dt, figcaption, .book__more) {
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  color: var(--ink);
+}
+
+/* The way out: a sticker-like button that is the first thing on the page. */
+.book__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px 10px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff8e6;
+  box-shadow: 0 4px 0 var(--ink);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.book__close span {
+  font-size: 20px;
+  transition: transform 0.2s ease;
+}
+
+.book__close:hover {
+  background: #fff1c9;
+}
+
+.book__close:hover span {
+  transform: translateX(-3px);
+}
+
+.book__close:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.book__close:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+/* Around the open book, the water itself is a way back. */
+html[data-reading='true'] .scene {
+  cursor: pointer;
+}
+
+.book__kind {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.book h1 {
+  margin: 2px 0 12px;
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 800;
+  line-height: 1;
+  outline: none;
+}
+
+.book__summary {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.book__facts {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding: 14px 0;
+  border-block: 2px dashed rgba(74, 21, 18, 0.35);
+}
+
+.book__facts dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.book__facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.book__more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.book__more a {
+  color: var(--ink);
+}
+
+.book__section {
+  margin-top: 26px;
+}
+
+.book h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.book__section p {
+  margin: 0 0 10px;
+  max-width: 62ch;
+}
+
+.book__section ul:not(.swatches) {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.book__section li {
+  margin-bottom: 4px;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.swatches span {
+  display: block;
+  height: 44px;
+  margin-bottom: 5px;
+  border: 2px solid var(--ink);
+  border-radius: 5px;
+}
+
+.swatches small {
+  display: block;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* Pictures are taped into the book, each at a slight angle. */
+.taped {
+  position: relative;
+  margin: 30px 0 0;
+  rotate: 0.5deg;
+}
+
+.taped:first-child {
+  margin-top: 6px;
+}
+
+.taped:nth-of-type(even) {
+  rotate: -0.6deg;
+}
+
+.taped img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.taped::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -11px;
+  z-index: 1;
+  width: 92px;
+  height: 22px;
+  translate: -50% 0;
+  rotate: -2deg;
+  background: rgba(255, 229, 102, 0.78);
+  box-shadow: 0 1px 0 rgba(74, 21, 18, 0.18);
+}
+
+.taped__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.taped__open:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 4px;
+}
+
+/* A picture shown full size, over a dimmed page. */
+.enlarged {
+  --ink: #4a1512;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 4vw, 48px);
+  background: rgba(30, 14, 12, 0.82);
+  cursor: zoom-out;
+  animation: book-fade 0.18s ease both;
+}
+
+.enlarged img {
+  max-width: 100%;
+  max-height: calc(100dvh - 2 * clamp(12px, 4vw, 48px));
+  width: auto;
+  height: auto;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.35);
+  cursor: default;
+}
+
+.enlarged__close {
+  position: absolute;
+  right: clamp(10px, 2.5vw, 26px);
+  top: clamp(10px, 2.5vw, 22px);
+  padding: 7px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #f8f1dd;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+  color: var(--ink);
+  font: 800 14px var(--font-ui), ui-rounded, system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.enlarged__close:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+.taped figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* A live website, in a small hand-drawn browser window. */
+.browser {
+  margin: 0;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.browser__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-bottom: 2px solid var(--ink);
+  background: #f0e6cc;
+}
+
+.browser__bar span {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+}
+
+.browser__bar p {
+  flex: 1;
+  margin: 0 0 0 6px;
+  padding: 1px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browser__view {
+  position: relative;
+  overflow: hidden;
+}
+
+.browser__view iframe {
+  /* Out of the flow: it is laid out at desktop size and scaled down to fit. */
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.browser__link {
+  position: absolute;
+  inset: 0;
+}
+
+.button {
+  display: inline-block;
+  padding: 12px 26px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #ffe566;
+  box-shadow: 0 5px 0 var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.button:hover {
+  background: #fff08f;
+}
+
+.button:active {
+  box-shadow: 0 1px 0 var(--ink);
+  translate: 0 4px;
+}
+
+.book :is(a, button):focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+/* On narrow screens the book becomes a single page that fills the screen. */
+@media (max-width: 820px) {
+  .book {
+    grid-template-columns: 1fr;
+    width: auto;
+    max-height: none;
+    height: auto;
+    margin: 10px;
+  }
+}
+
+/* On a phone the book starts below the round sound switch instead of under it. */
+@media (max-width: 600px) {
+  .book {
+    margin-top: 66px;
+  }
+}
+
+@media (max-width: 820px) {
+
+  .book__title-page {
+    position: static;
+    padding: 20px 18px 6px;
+  }
+
+  .book__work {
+    padding: 18px 18px 26px;
+    border-left: 0;
+    background: none;
+  }
+}
+
+/* The pointer: a cozy arrowhead on the pond, a pencil on paper, a bubble underwater. Only for a mouse
+   or trackpad; the ordinary cursor stays where text is typed. */
+@media (hover: hover) and (pointer: fine) {
+  html[data-cursor='on'],
+  html[data-cursor='on'] * {
+    cursor: none !important;
+  }
+
+  html[data-cursor='on'] :is(input, textarea, [contenteditable='true']) {
+    cursor: text !important;
+  }
+}
+
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  perspective: 300px;
+}
+
+.cursor[data-visible='true'] {
+  opacity: 1;
+}
+
+/* Everything turns, swings and squashes about the point itself. */
+.cursor__swing,
+.cursor__flip,
+.cursor__press {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+
+.cursor svg {
+  position: absolute;
+  display: none;
+  overflow: visible;
+  filter: drop-shadow(0 1px 1px rgba(46, 26, 23, 0.25));
+  transition:
+    transform 0.2s cubic-bezier(0.3, 1.4, 0.5, 1),
+    filter 0.6s ease;
+}
+
+/* Each picture placed so its point sits on the pointer. */
+.cursor__arrow {
+  left: -3px;
+  top: -3px;
+  transform-origin: 3px 3px;
+}
+
+.cursor__pencil {
+  left: -2.3px;
+  top: -2.3px;
+}
+
+.cursor__hand {
+  left: -8.4px;
+  top: -0.9px;
+  transform-origin: 8.4px 0.9px;
+}
+
+.cursor__bubble {
+  left: -14px;
+  top: -14px;
+  transform-origin: 14px 14px;
+}
+
+.cursor[data-mode='arrow'] .cursor__arrow,
+.cursor[data-mode='pencil'][data-active='false'] .cursor__pencil,
+.cursor[data-mode='pencil'][data-active='true'] .cursor__hand,
+.cursor[data-mode='bubble'] .cursor__bubble {
+  display: block;
+}
+
+/* Over something to click, the arrow puffs up with a little bounce. */
+.cursor[data-active='true'] .cursor__arrow {
+  transform: scale(1.22);
+}
+
+.cursor[data-active='true'] .cursor__bubble {
+  transform: scale(1.3);
+}
+
+/* At night the arrow carries a little of the lantern's light, and the bubble the plankton's. */
+html[data-mood='night'] .cursor__arrow {
+  filter: drop-shadow(0 0 4px rgba(255, 196, 110, 0.95)) drop-shadow(0 0 10px rgba(255, 170, 80, 0.6));
+}
+
+html[data-mood='night'] .cursor__bubble {
+  filter: drop-shadow(0 0 5px rgba(150, 230, 255, 0.85));
+}
+

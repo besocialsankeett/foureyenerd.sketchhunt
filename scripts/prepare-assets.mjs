@@ -717,11 +717,17 @@ let skin, shade, stub;
     .composite([{ input: band, top: Math.round((1000 - bandHeight) / 2), left: 0 }])
     .webp({ quality: 86 })
     .toFile(path.join(LIB, 'tin.webp'));
+  // The Tuning Wave: the glowing guitar from its home page, on its own black.
+  await sharp(path.join(shots, 'tuningwave-full.png'))
+    .extract({ left: 598, top: 70, width: 664, height: 830 })
+    .resize(size)
+    .webp({ quality: 86 })
+    .toFile(path.join(LIB, 'tuningwave.webp'));
   // Square thumbnails for the library's row, each cut to the part that reads at a glance: the
   // mirror and the box as they are, the first half of senk8's wordmark, and The Indian Netizens' headline
   // with its colour. Where each square sits in its picture is kept, as shares of the picture's
   // width (left, side) and height (top), so a thumbnail can open out into the whole picture.
-  const crops = { moro: [0, 100, 800], kika: [0, 100, 800], senk8: [10, 530, 380], tin: [120, 110, 580] };
+  const crops = { moro: [0, 100, 800], kika: [0, 100, 800], senk8: [10, 530, 380], tin: [120, 110, 580], tuningwave: [100, 140, 600] };
   manifest.libraryThumbs = {};
   for (const [name, [left, top, side]] of Object.entries(crops)) {
     await sharp(path.join(LIB, `${name}.webp`))

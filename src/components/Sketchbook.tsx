@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Sound, type Sfx } from '@/audio/sound';
-import { projectPath, projects } from '@/content/projects';
+import { pondProjects, projectPath, projects } from '@/content/projects';
 import { site } from '@/content/site';
 import { Engine } from '@/scene/Engine';
 import { fixedHour } from '@/scene/daylight';
@@ -18,7 +18,7 @@ function hintFor(phase: Phase, caught: number | null, tossable: boolean) {
   if (phase === 'waiting') return 'Wait for a bite';
   if (phase !== 'idle') return null;
   if (caught === null) return 'Pick a tag to go fishing, or scroll down for the project library';
-  return tossable ? 'Click the water to throw it back' : `You caught ${projects[caught].title}. Open it up.`;
+  return tossable ? 'Click the water to throw it back' : `You caught ${pondProjects[caught].title}. Open it up.`;
 }
 
 /**
@@ -95,7 +95,7 @@ export default function Sketchbook() {
     if (!canvas) return;
     const engine = new Engine(
       canvas,
-      projects.map((project) => project.catch),
+      pondProjects.map((project) => project.catch),
     );
     engineRef.current = engine;
     // Exposed for debugging in the browser console during development.
@@ -197,7 +197,7 @@ export default function Sketchbook() {
     let shownSelected: number | null | undefined;
     let shownCaught: number | null | undefined;
     engine.onCatchClick = () => {
-      if (typeof shownCaught === 'number') routerRef.current.push(projectPath(projects[shownCaught]), { scroll: false });
+      if (typeof shownCaught === 'number') routerRef.current.push(projectPath(pondProjects[shownCaught]), { scroll: false });
     };
     const unsubscribe = engine.subscribe((frame) => {
       // These move every frame, so they are positioned directly rather than through React.
@@ -215,7 +215,8 @@ export default function Sketchbook() {
 
       // A case study read at the surface needs its catch in the boat, and open, however the
       // visitor got here. One read underwater leaves the boat as it was.
-      const want = underwaterRef.current ? -1 : readingRef.current;
+      // (Indexes on the pond count only the projects that have a catch.)
+      const want = underwaterRef.current || readingRef.current < 0 ? -1 : pondProjects.indexOf(projects[readingRef.current] as (typeof pondProjects)[number]);
       if (want >= 0 && frame.caught !== want) engine.place(want);
       engine.setOpen(want >= 0 && frame.caught === want);
 
@@ -372,7 +373,7 @@ export default function Sketchbook() {
         </svg>
       </Link>
       <nav className="tags" aria-label="Projects" data-ready={ready}>
-        {projects.map((project, i) => (
+        {pondProjects.map((project, i) => (
           <button
             key={project.slug}
             ref={(element) => {
@@ -412,14 +413,14 @@ export default function Sketchbook() {
       </button>
       <Link
         ref={openRef}
-        href={caught !== null ? projectPath(projects[caught]) : '/'}
+        href={caught !== null ? projectPath(pondProjects[caught]) : '/'}
         scroll={false}
         className="open"
         data-visible={canOpen}
         tabIndex={canOpen ? 0 : -1}
         aria-hidden={!canOpen}
       >
-        Open{caught !== null && <span className="visually-hidden"> the {projects[caught].title} case study</span>}
+        Open{caught !== null && <span className="visually-hidden"> the {pondProjects[caught].title} case study</span>}
       </Link>
       <p className="hint" data-visible={hint !== null} aria-live="polite">
         {hint}

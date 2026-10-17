@@ -21,8 +21,9 @@ export type Project = {
   title: string;
   /** What kind of work it is, in a few words. Shown on the tag. */
   kind: string;
-  /** The object this project comes out of the water as. */
-  catch: 'mirror' | 'box' | 'bottle' | 'globe';
+  /** The object this project comes out of the water as. Without one, the project is in the
+   * library and has its case study, but no marker on the pond. */
+  catch?: 'mirror' | 'box' | 'bottle' | 'globe';
   /** One or two sentences: what it is. Also used when the page is shared. */
   summary: string;
   facts: { label: string; value: string }[];

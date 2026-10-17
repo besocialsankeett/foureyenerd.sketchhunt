@@ -89,7 +89,7 @@ export type Pose = (typeof POSES)[keyof typeof POSES];
 
 /** Design positions of the project markers on the water, for wide views. */
 export const TAG_SPOTS = {
-  wide: [[330, 775], [565, 900], [775, 945], [1290, 905]] as Point[],
+  wide: [[330, 775], [565, 900], [775, 945], [1290, 905], [1040, 990]] as Point[],
 };
 
 /**
@@ -101,7 +101,7 @@ export const tagSpots = (view: View, pixelHeight = 1000): Point[] => {
   // their usual places, so they float in one row across the water below the boat instead.
   if (view.width / view.height >= 1.1 && pixelHeight < 500) {
     const y = DESIGN_H - (view.top - view.height * 0.74);
-    return [0.14, 0.38, 0.62, 0.86].map((share) => [view.left + view.width * share, y] as Point);
+    return [0.1, 0.3, 0.5, 0.7, 0.9].map((share) => [view.left + view.width * share, y] as Point);
   }
   if (view.width / view.height >= 1.1) return TAG_SPOTS.wide;
   const bottom = DESIGN_H - view.bottom;
@@ -112,6 +112,7 @@ export const tagSpots = (view: View, pixelHeight = 1000): Point[] => {
     [column(0.72), row(0.18)],
     [column(0.28), row(0.42)],
     [column(0.72), row(0.42)],
+    [column(0.5), row(0.64)],
   ];
 };
 

@@ -79,6 +79,8 @@ export const POSES = {
   haul: { rodAngle: rad(98), grip: [16, 26] as Point, lean: -0.13, snap: 2.4 },
   lower: { rodAngle: rad(121), grip: [0, 8] as Point, lean: -0.03, snap: 2 },
   flick: { rodAngle: rad(150), grip: [-16, 4] as Point, lean: 0.05, snap: 6 },
+  /** Both fists, rod and all, punched up in a little cheer. */
+  pump: { rodAngle: rad(100), grip: [12, 42] as Point, lean: -0.06, snap: 6 },
 };
 
 /** Where a catch is set down: the front bench. Design x of its middle and y of its base. */

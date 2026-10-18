@@ -1,11 +1,7 @@
 'use client';
 
-import { Caveat } from 'next/font/google';
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import type { Engine } from '@/scene/Engine';
-
-/** A hand-lettered face for the line of thanks. */
-const hand = Caveat({ weight: '700', subsets: ['latin'] });
 
 /** Where on the screen the note's bubble was when the view began to rise, and its size. */
 export type ThanksDetail = { x: number; y: number; size: number } | null;
@@ -15,13 +11,13 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /**
  * After a note is sent: the bubble the note rolled into floats up, and the view follows it
  * back up to the pond. It comes up just past the boat's bow and pops there; he is delighted,
- * and says thank you in a comic speech bubble.
+ * and pumps his fists, with a soft ding.
  */
 export default function ThankYou({ engine }: { engine: RefObject<Engine | null> }) {
   const bubble = useRef<HTMLDivElement>(null);
   const [from, setFrom] = useState<ThanksDetail>(null);
-  /** Where his speech bubble points to: the top of his head, on the screen. */
-  const [line, setLine] = useState<{ x: number; y: number } | null>(null);
+  /** Said to screen readers, since the thanks itself is only his face and his cheer. */
+  const [said, setSaid] = useState(false);
 
   useEffect(() => {
     const onThanks = (event: Event) => setFrom((event as CustomEvent<ThanksDetail>).detail ?? { x: 0, y: 0, size: 0 });
@@ -71,11 +67,11 @@ export default function ThankYou({ engine }: { engine: RefObject<Engine | null> 
       if (gone) return;
       engine.current?.thank();
       window.dispatchEvent(new CustomEvent('sketchbook:sound', { detail: { name: 'drip', amount: 0.8 } }));
+      // A soft ding a beat after the pop.
+      setTimeout(() => window.dispatchEvent(new CustomEvent('sketchbook:sound', { detail: { name: 'ding', amount: 0.35 } })), 350);
+      setTimeout(() => setSaid(false), 4000);
+      setSaid(true);
       setFrom(null);
-      const head = engine.current?.speechPoint() ?? { x: window.innerWidth / 2, y: window.innerHeight * 0.35 };
-      setLine(head);
-      await wait(2800);
-      if (!gone) setLine(null);
     };
     void run();
     return () => {
@@ -94,24 +90,8 @@ export default function ThankYou({ engine }: { engine: RefObject<Engine | null> 
         />
       )}
       <p className="visually-hidden" role="status">
-        {line ? 'Note received, thank you!' : ''}
+        {said ? 'Note received, thank you!' : ''}
       </p>
-      {line && (
-        <div
-          className="thanks__say"
-          aria-hidden="true"
-          style={
-            {
-              // Kept on the screen; the tail still points at his head.
-              left: Math.min(window.innerWidth - 150, Math.max(150, line.x)),
-              top: line.y,
-              '--tail': `${line.x - Math.min(window.innerWidth - 150, Math.max(150, line.x))}px`,
-            } as CSSProperties
-          }
-        >
-          <p className={hand.className}>note received, thank you!</p>
-        </div>
-      )}
     </>
   );
 }

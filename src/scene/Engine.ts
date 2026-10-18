@@ -543,7 +543,7 @@ export class Engine {
 
   /**
    * A note was left in the shell: a bubble pops at the surface beside the boat, and he is
-   * delighted for a moment.
+   * delighted for a moment and pumps his fists.
    */
   thank() {
     const boat = this.boat;
@@ -551,21 +551,10 @@ export class Engine {
     const x = boat.hullEnds[1] + 70, y = boat.waterY - 6;
     this.ripple(x, y, 0.06, 0.7);
     this.droplets?.burst(x, y, 10, 260, 20);
-    this.fishing.cheer(this.time + 3);
+    this.fishing.cheer(this.time, 3);
   }
 
   /** Where on the screen, at the surface, the thank-you bubble pops: just past the boat's bow. */
-  /** Where on the screen the top of his head is, for him to say something from. */
-  speechPoint() {
-    if (!this.boat || !this.puppet) return null;
-    const { x, y } = this.puppet.headTop(this.boat);
-    const rect = this.canvas.getBoundingClientRect();
-    return {
-      x: rect.left + ((x - this.view.left) / this.view.width) * rect.width,
-      y: rect.top + (1 - (y - this.view.bottom) / this.view.height) * rect.height,
-    };
-  }
-
   thanksPoint() {
     const boat = this.boat;
     if (!boat) return null;

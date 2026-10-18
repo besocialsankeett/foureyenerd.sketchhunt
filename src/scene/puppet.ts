@@ -254,11 +254,6 @@ export class Puppet {
   }
 
   /** Advance one frame. `pull` is the tug of the line on the rod tip. */
-  /** The top of his head, in the world, for a speech bubble to come from. */
-  headTop(boat: Boat) {
-    return { x: boat.group.position.x + this.head.position.x, y: boat.group.position.y + this.head.position.y + 150 };
-  }
-
   update(dt: number, time: number, boat: Boat, pull: THREE.Vector2) {
     // Urgent poses are chased harder: the same springs, wound tighter.
     const { snap } = this.pose;

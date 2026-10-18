@@ -232,9 +232,13 @@ export class Fishing {
     this.floatMaterial.uniforms.uClip.value = clipFloat ? 1 : 0;
   }
 
-  /** He is delighted until then, while idle. */
-  cheer(until: number) {
-    this.cheerUntil = until;
+  /** Until then, while idle, he pumps his fists twice. */
+  private pumpUntil = 0;
+
+  /** He is delighted for a while, and pumps his fists, while idle. */
+  cheer(now: number, seconds: number) {
+    this.cheerUntil = now + seconds;
+    this.pumpUntil = now + 1;
   }
 
   update(dt: number, time: number, puppet: Puppet, boat: Boat) {
@@ -262,7 +266,7 @@ export class Fishing {
     this.dip = 0;
     switch (this.phase) {
       case 'idle':
-        puppet.pose = POSES.rest;
+        puppet.pose = time < this.pumpUntil && Math.floor((this.pumpUntil - time) / 0.25) % 2 === 1 ? POSES.pump : POSES.rest;
         puppet.setExpression(time < this.cheerUntil ? 'delighted' : 'happy');
         this.setWaterLevel(this.restWaterY, false);
         break;

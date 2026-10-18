@@ -12,9 +12,9 @@ export const site = {
   ],
   /**
    * The Formspree form that notes left in the shell are sent to: the letters after
-   * formspree.io/f/ in the form's endpoint. Empty until the form is made.
+   * formspree.io/f/ in the form's endpoint.
    */
-  notesForm: '',
+  notesForm: 'mnpjrbaa',
   /** Arched over his head on the opening's start screen; it reads on into the name below. */
   hello: 'hello, i am sankeett aka',
 };

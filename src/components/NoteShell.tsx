@@ -27,6 +27,8 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
   const [stage, setStage] = useState<Stage>('closed');
   const [sticker, setSticker] = useState<string | null>(null);
   const [error, setError] = useState('');
+  /** The shell is springing open over its pearl, just now, for a note that was sent. */
+  const [opening, setOpening] = useState(false);
   const card = useRef<HTMLFormElement>(null);
   const text = useRef<HTMLTextAreaElement>(null);
   const shell = useRef<HTMLButtonElement>(null);
@@ -47,6 +49,7 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
   const open = () => {
     if (writing) return;
     setError('');
+    setOpening(false);
     setStage('open');
     sound('whoosh', 0.5);
   };
@@ -99,6 +102,7 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
     sound('bubble', 1);
     const done = () => {
       setStage('sent');
+      setOpening(true);
       setSticker(null);
       shell.current?.focus({ preventScroll: true });
     };
@@ -117,7 +121,10 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
   };
 
   return (
-    <div className="note" data-shown={shown} data-stage={stage}>
+    <div className="note" data-shown={shown} data-stage={stage} data-opening={opening}>
+      <p className="note__tap" aria-hidden="true">
+        {stage === 'sent' ? 'Thank you! Tap to leave another' : 'Tap to open'}
+      </p>
       <button
         ref={shell}
         type="button"
@@ -130,15 +137,13 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
         <img className="note__closed" src={manifest.shell.closed.file} alt="" draggable={false} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="note__open" src={manifest.shell.open.file} alt="" draggable={false} />
+        <span className="note__puff" aria-hidden="true" />
         <span
           className="note__pearl"
           aria-hidden="true"
           style={{ left: `${pearl.x * 100}%`, top: `${pearl.y * 100}%`, width: `${pearl.r * 200}%` }}
         />
       </button>
-      <p className="note__tap" aria-hidden="true">
-        {stage === 'sent' ? 'Thank you! Tap to leave another' : 'Tap to open'}
-      </p>
       <p className="visually-hidden" role="status">
         {stage === 'sent' ? 'Note sent. Thank you!' : ''}
       </p>

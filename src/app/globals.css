@@ -2073,35 +2073,151 @@ html[data-mood='night'] .cursor__bubble {
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding-bottom: max(10vh, calc(env(safe-area-inset-bottom) + 40px));
+  padding-bottom: max(4vh, calc(env(safe-area-inset-bottom) + 14px));
   opacity: 0;
-  transform: translateY(30vh);
   pointer-events: none;
-  transition:
-    opacity 0.6s ease,
-    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 0.5s ease;
 }
 
 .note[data-shown='true'] {
   opacity: 1;
-  transform: none;
 }
 
 .note[data-shown='true'] > :not(.note__card) {
   pointer-events: auto;
 }
 
+/* A palm-sized scallop lying on the floor: it sinks down through the water, swaying side to
+   side as the water pushes back on it, lands, rocks and settles, and puffs up a little sand. */
 .note__shell {
   position: relative;
-  width: min(48vw, 34vh, 280px);
+  width: min(28vw, 17vh, 150px);
   aspect-ratio: 636 / 683;
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
-  filter: drop-shadow(0 0 18px rgba(255, 214, 190, 0.45));
-  animation: note-breathe 4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 12px rgba(255, 214, 190, 0.4));
   transition: opacity 0.3s ease;
+}
+
+.note[data-shown='true'] .note__shell {
+  animation:
+    note-sink 2.4s cubic-bezier(0.33, 0.1, 0.4, 1) both,
+    note-glow 4s ease-in-out 2.4s infinite;
+}
+
+@keyframes note-sink {
+  0% {
+    transform: translateY(-62vh) rotate(-28deg);
+  }
+
+  30% {
+    transform: translateY(-38vh) rotate(16deg);
+  }
+
+  55% {
+    transform: translateY(-17vh) rotate(-10deg);
+  }
+
+  76% {
+    transform: translateY(-4vh) rotate(5deg);
+  }
+
+  86% {
+    transform: translateY(0) rotate(-3deg) scale(1.03, 0.96);
+  }
+
+  93% {
+    transform: translateY(-2px) rotate(1.5deg);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes note-glow {
+  50% {
+    filter: drop-shadow(0 0 22px rgba(255, 222, 204, 0.65));
+  }
+}
+
+/* Its shadow on the sand, darker and tighter as it comes down onto it. */
+.note__shell::after {
+  content: '';
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -5%;
+  z-index: -1;
+  height: 14%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(4, 18, 32, 0.55), rgba(4, 18, 32, 0));
+}
+
+.note[data-shown='true'] .note__shell::after {
+  animation: note-shadow 2.4s cubic-bezier(0.33, 0.1, 0.4, 1) both;
+}
+
+@keyframes note-shadow {
+  0% {
+    opacity: 0;
+    transform: translateY(62vh) scale(2.2);
+  }
+
+  30% {
+    transform: translateY(38vh) scale(1.8);
+  }
+
+  55% {
+    transform: translateY(17vh) scale(1.4);
+  }
+
+  76% {
+    opacity: 0.6;
+    transform: translateY(4vh) scale(1.1);
+  }
+
+  86%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The sand it kicks up as it lands. */
+.note__puff {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  bottom: -8%;
+  height: 34%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(226, 214, 180, 0.5), rgba(226, 214, 180, 0));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.note[data-shown='true'] .note__puff {
+  animation: note-puff 1.6s ease-out 2s both;
+}
+
+@keyframes note-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.4, 0.3);
+  }
+
+  20% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-30%) scale(1.3, 1.1);
+  }
 }
 
 .note__shell:focus-visible {
@@ -2110,22 +2226,14 @@ html[data-mood='night'] .cursor__bubble {
   border-radius: 24px;
 }
 
-@keyframes note-breathe {
-  50% {
-    transform: translateY(-4px) scale(1.015);
-    filter: drop-shadow(0 0 30px rgba(255, 220, 200, 0.7));
-  }
-}
-
 .note__shell img {
   position: absolute;
   left: 50%;
   bottom: 0;
   width: 100%;
   translate: -50% 0;
-  transition:
-    opacity 0.35s ease,
-    transform 0.45s cubic-bezier(0.3, 1.4, 0.5, 1);
+  transform-origin: 50% 90%;
+  transition: opacity 0.3s ease;
   user-select: none;
 }
 
@@ -2135,17 +2243,91 @@ html[data-mood='night'] .cursor__bubble {
 
 .note__open {
   opacity: 0;
-  transform: scale(0.9);
 }
 
 .note[data-stage='sent'] .note__closed {
   opacity: 0;
-  transform: scale(1.06);
 }
 
 .note[data-stage='sent'] .note__open {
   opacity: 1;
-  transform: none;
+}
+
+/* Tapped, it gives a little shake as the note slips out. */
+.note[data-stage='open'] .note__closed {
+  animation: note-rattle 0.45s ease-in-out;
+}
+
+@keyframes note-rattle {
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  50% {
+    transform: rotate(4deg);
+  }
+
+  75% {
+    transform: rotate(-2deg);
+  }
+}
+
+/* The thank-you: the closed shell shakes, squeezes down, and springs open on its hinge,
+   showing the pearl, which lights up. */
+.note[data-opening='true'] .note__closed {
+  animation: note-unlatch 0.9s ease-in both;
+}
+
+@keyframes note-unlatch {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+
+  15% {
+    opacity: 1;
+    transform: rotate(-5deg);
+  }
+
+  30% {
+    opacity: 1;
+    transform: rotate(5deg);
+  }
+
+  45% {
+    opacity: 1;
+    transform: rotate(-3deg);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.04, 0.9);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.02, 0.7);
+  }
+}
+
+.note[data-opening='true'] .note__open {
+  animation: note-spring 0.75s cubic-bezier(0.3, 1.5, 0.5, 1) 0.7s both;
+}
+
+@keyframes note-spring {
+  0% {
+    opacity: 0;
+    transform: scale(1, 0.45);
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* While a note is being written, the shell waits dimly behind it. */
@@ -2172,6 +2354,13 @@ html[data-mood='night'] .cursor__bubble {
   animation: note-pearl 2.6s ease-in-out infinite;
 }
 
+.note[data-opening='true'] .note__pearl {
+  transition-delay: 1.2s;
+  animation:
+    note-flash 0.9s ease-out 1.2s both,
+    note-pearl 2.6s ease-in-out 2.1s infinite;
+}
+
 @keyframes note-pearl {
   50% {
     transform: scale(1.35);
@@ -2179,8 +2368,25 @@ html[data-mood='night'] .cursor__bubble {
   }
 }
 
+@keyframes note-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  35% {
+    opacity: 1;
+    transform: scale(2.4);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .note__tap {
-  margin: 14px 0 0;
+  margin: 0 0 14px;
   padding: 8px 16px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 999px;
@@ -2195,6 +2401,10 @@ html[data-mood='night'] .cursor__bubble {
   text-shadow: 0 1px 2px rgba(6, 30, 52, 0.4);
   pointer-events: none !important;
   transition: opacity 0.3s ease;
+}
+
+.note[data-shown='true'] .note__tap {
+  animation: plib-fade-in 0.5s ease 2.3s both;
 }
 
 .note:is([data-stage='open'], [data-stage='sending']) .note__tap {
@@ -2355,6 +2565,10 @@ html[data-mood='night'] .cursor__bubble {
 
 @media (prefers-reduced-motion: reduce) {
   .note__shell,
+  .note__shell::after,
+  .note__puff,
+  .note__shell img,
+  .note__tap,
   .note__pearl,
   .note__card,
   .note__stamp,

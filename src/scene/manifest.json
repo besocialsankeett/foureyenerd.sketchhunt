@@ -172,6 +172,11 @@
       "w": 570,
       "h": 1401
     },
+    "guitar": {
+      "file": "/scene/catch-guitar.webp",
+      "w": 440,
+      "h": 1365
+    },
     "box": {
       "file": "/scene/catch-box.webp",
       "w": 662,

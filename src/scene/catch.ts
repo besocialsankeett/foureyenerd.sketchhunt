@@ -5,8 +5,8 @@ import type { Part } from './puppet';
 import { REFLECT_LAYER, createSpriteMaterial, type SpriteShared } from './sprite';
 import { GLOBE, INDIA_SPIN, globeMaterial, standPart } from './globe';
 
-export type CatchKind = 'mirror' | 'box' | 'bottle' | 'globe';
-export type CatchTextures = Record<'mirror' | 'box' | 'drawer' | 'bottle' | 'cork' | 'note' | 'globe', Part>;
+export type CatchKind = 'mirror' | 'box' | 'bottle' | 'globe' | 'guitar';
+export type CatchTextures = Record<'mirror' | 'box' | 'drawer' | 'bottle' | 'cork' | 'note' | 'globe' | 'guitar', Part>;
 
 /** How tall each catch stands in the scene, and how heavy it feels on the line. */
 const SPEC: Record<CatchKind, { height: number; weight: number }> = {
@@ -14,6 +14,7 @@ const SPEC: Record<CatchKind, { height: number; weight: number }> = {
   box: { height: 84, weight: 1 },
   bottle: { height: 100, weight: 0.7 },
   globe: { height: GLOBE.height, weight: 1.2 },
+  guitar: { height: 230, weight: 1.4 },
 };
 
 /** Draw order while it is out over the water, and once it is inside the boat. */
@@ -93,6 +94,8 @@ export class Catch {
     const bottleScale = (SPEC.bottle.height - corkAbove) / textures.bottle.h;
 
     const mirror = new THREE.Group().add(sprite(textures.mirror, mirrorScale, 0, 0));
+    const guitarScale = SPEC.guitar.height / textures.guitar.h;
+    const guitar = new THREE.Group().add(sprite(textures.guitar, guitarScale, 0, 0));
     // The box image includes its ribbon tab on the right; hang it from the middle of the box.
     // Its drawer sits behind it and slides out sideways when it opens.
     this.drawer = sprite(textures.drawer, boxScale, 3.2, 0, -0.002);
@@ -113,12 +116,13 @@ export class Catch {
     this.meshes.push(ball);
     this.materials.push(this.globeMaterial);
     const globe = new THREE.Group().add(sprite(standPart(), 0.5, 0, 0), ball);
-    this.bodies = { mirror, box, bottle, globe };
+    this.bodies = { mirror, box, bottle, globe, guitar };
     this.width = {
       mirror: textures.mirror.w * mirrorScale,
       box: textures.box.w * boxScale,
       bottle: textures.bottle.w * bottleScale,
       globe: GLOBE.width * 0.75,
+      guitar: textures.guitar.w * guitarScale,
     };
     for (const body of Object.values(this.bodies)) {
       body.visible = false;
@@ -180,6 +184,9 @@ export class Catch {
     this.note.scale.setScalar(0.3 + 0.7 * t);
     // The mirror has no moving parts: it swells a little as it opens.
     this.bodies.mirror.scale.setScalar(1 + 0.05 * t + 0.25 * t * (1 - t));
+    // The guitar rocks once, as if strummed, and swells a little.
+    this.bodies.guitar.scale.setScalar(1 + 0.04 * t + 0.2 * t * (1 - t));
+    this.bodies.guitar.rotation.z = Math.sin(t * Math.PI * 2) * 0.08 * (1 - t);
   }
 
   /** No more dripping: it has been sitting in the boat a while. */

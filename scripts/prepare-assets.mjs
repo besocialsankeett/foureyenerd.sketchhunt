@@ -637,10 +637,13 @@ let skin, shade, stub;
 {
   const byX = (a, b) => a.box.x - b.box.x;
   const mirror = stripHaze(await loadRaw(path.join(SRC, 'catch-mirror.webp')));
+  // The Tuning Wave's electric guitar, dripping, with pond weed round its neck.
+  const guitar = clearWhite(stripHaze(await loadRaw(path.join(SRC, 'catch-guitar.webp'))));
   const [box, drawer] = sprites(stripHaze(await loadRaw(path.join(SRC, 'catch-kika.webp')))).sort(byX);
   const [bottle, cork, note] = sprites(stripHaze(await loadRaw(path.join(SRC, 'catch-bottle.webp')))).sort(byX);
   manifest.catches = {
     mirror: await save(crop(mirror, bounds(mirror)), 'catch-mirror.webp'),
+    guitar: await save(crop(guitar, bounds(guitar)), 'catch-guitar.webp'),
     box: await save(box.image, 'catch-box.webp'),
     drawer: await save(drawer.image, 'catch-drawer.webp'),
     bottle: await save(bottle.image, 'catch-bottle.webp'),

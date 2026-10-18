@@ -312,7 +312,7 @@ html[data-mood='night'] .masthead {
 }
 
 /* Things that belong to the surface, put away while the view is below it. */
-html[data-dive='true'] :is(.masthead, .tags, .pull, .open) {
+html[data-dive='true'] :is(.masthead, .tags, .pull, .open, .socials) {
   opacity: 0 !important;
   pointer-events: none !important;
   transition: opacity 0.3s ease;
@@ -349,7 +349,7 @@ html[data-dive='true'] :is(.masthead, .tags, .pull, .open) {
   outline-offset: 3px;
 }
 
-html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open) {
+html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials) {
   opacity: 0 !important;
   pointer-events: none !important;
 }
@@ -1158,6 +1158,68 @@ html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open) {
   .swipe::before,
   .swipe svg {
     animation: none;
+  }
+}
+
+/* Where to find him: a cream pill of outline icons beside the sound switch. */
+.socials {
+  position: fixed;
+  right: calc(clamp(12px, 2.5vw, 28px) + 150px);
+  top: clamp(12px, 3vh, 24px);
+  z-index: 3;
+  display: flex;
+  gap: 2px;
+  padding: 3px 6px;
+  border: 2px solid #4a1512;
+  border-radius: 999px;
+  background: #f8f1dd;
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.socials[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.socials a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #4a1512;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.socials a:hover,
+.socials a:focus-visible {
+  background: #ffe566;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.socials svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* On a phone: a row under the name, clear of the round icons on the right. */
+@media (max-width: 600px) {
+  .socials {
+    left: 16px;
+    right: auto;
+    top: calc(max(16px, env(safe-area-inset-top)) + 86px);
+  }
+
+  .socials a {
+    width: 34px;
+    height: 34px;
   }
 }
 

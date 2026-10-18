@@ -13,6 +13,27 @@ import CaseStudy from './CaseStudy';
 import Cursor from './Cursor';
 import Intro from './Intro';
 
+/** Outline icons for the places to find him, drawn like the rest of the page's line work. */
+const ICONS: Record<string, React.ReactNode> = {
+  Instagram: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+    </>
+  ),
+  X: <path d="M4 4l16 16M20 4L4 20" />,
+  GitHub: (
+    <path d="M9 19c-4 1.3-4-2-6-2.5M15 21v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+  ),
+  Behance: (
+    <>
+      <path d="M3 6h5a3 3 0 0 1 0 6H3zM3 12h6a3 3 0 0 1 0 6H3z" />
+      <path d="M14 14h7a3.5 3.5 0 1 0-1 2.5M15 7h5" />
+    </>
+  ),
+};
+
 /** What the line of help at the bottom says at each moment. */
 function hintFor(phase: Phase, caught: number | null, tossable: boolean) {
   if (phase === 'waiting') return 'Wait for a bite';
@@ -343,6 +364,15 @@ export default function Sketchbook() {
         </svg>
         <span className="sound__label">Sound is {soundOn ? 'on' : 'off'}</span>
       </button>
+      <nav className="socials" aria-label="Find me elsewhere" data-visible={ready && reading < 0 && !browsing}>
+        {site.social.map((link) => (
+          <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.name} title={link.name}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {ICONS[link.name]}
+            </svg>
+          </a>
+        ))}
+      </nav>
       <Link href="/library" scroll={false} className="to-library" data-visible={ready && reading < 0 && !browsing}>
         {/* The sketchbook-tide mark: shown instead of the words on a phone. */}
         <svg className="to-library__icon" viewBox="0 0 64 64" aria-hidden="true">

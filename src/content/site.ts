@@ -3,6 +3,13 @@ export const site = {
   name: 'foureyenerd',
   line: 'Basically, with four eyes, I design and build stuff.',
   title: 'Sketchbook',
+  /** Where to find him, shown as icons on the pond. */
+  social: [
+    { name: 'Instagram', href: 'https://www.instagram.com/social.sankeett/' },
+    { name: 'X', href: 'https://x.com/foureyenerdd' },
+    { name: 'GitHub', href: 'https://github.com/besocialsankeett' },
+    { name: 'Behance', href: 'https://www.behance.net/sanketathawale' },
+  ],
   /** Arched over his head on the opening's start screen; it reads on into the name below. */
   hello: 'hello, i am sankeett aka',
 };

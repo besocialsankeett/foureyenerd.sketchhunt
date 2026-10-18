@@ -744,6 +744,23 @@ let skin, shade, stub;
     .toFile(path.join(root, 'public', 'projects', 'tin', 'certificate.webp'));
 }
 
+// The shell on the pond floor that takes notes: closed on the sheet's left, open with its pearl
+// on the right. Where the pearl sits is kept, as shares of the open shell's width and height.
+{
+  const sheet = clearWhite(await loadRaw(path.join(root, 'reference', 'shell.webp')));
+  const half = (x, w) => {
+    const side = crop(sheet, { x, y: 0, w, h: sheet.height });
+    return crop(side, bounds(side));
+  };
+  const closed = half(0, 760), openSide = crop(sheet, { x: 760, y: 0, w: sheet.width - 760, h: sheet.height });
+  const box = bounds(openSide);
+  manifest.shell = {
+    closed: await save(closed, 'shell-closed.webp'),
+    open: await save(crop(openSide, box), 'shell-open.webp'),
+    pearl: { x: (1097 - 760 - box.x) / box.w, y: (615 - box.y) / box.h, r: 92 / box.w },
+  };
+}
+
 await writeFile(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
 console.log(JSON.stringify(manifest));
 console.log('skin', hex(skin), 'shade', hex(shade));

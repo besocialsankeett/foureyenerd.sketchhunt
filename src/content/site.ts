@@ -10,6 +10,11 @@ export const site = {
     { name: 'GitHub', href: 'https://github.com/besocialsankeett' },
     { name: 'Behance', href: 'https://www.behance.net/sanketathawale' },
   ],
+  /**
+   * The Formspree form that notes left in the shell are sent to: the letters after
+   * formspree.io/f/ in the form's endpoint. Empty until the form is made.
+   */
+  notesForm: '',
   /** Arched over his head on the opening's start screen; it reads on into the name below. */
   hello: 'hello, i am sankeett aka',
 };

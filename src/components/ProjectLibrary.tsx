@@ -7,6 +7,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProp
 import type { Sfx } from '@/audio/sound';
 import { projectPath, projects } from '@/content/projects';
 import manifest from '@/scene/manifest.json';
+import NoteShell from './NoteShell';
 
 /** A tall, heavy condensed face for the big word, the nearest free match to the reference's. */
 const display = Anton({ weight: '400', subsets: ['latin'] });
@@ -82,6 +83,14 @@ export default function ProjectLibrary() {
   activeRef.current = active;
   const focusRef = useRef(focus);
   focusRef.current = focus;
+  /** Below the last project, on the pond floor with the shell; and whether a note is open. */
+  const [floor, setFloor] = useState(false);
+  const floorRef = useRef(floor);
+  floorRef.current = floor;
+  const writing = useRef(false);
+  const onNoteOpen = useCallback((open: boolean) => {
+    writing.current = open;
+  }, []);
 
   const choose = useCallback((index: number | null, fromPointer: boolean) => {
     byPointer.current = fromPointer;
@@ -90,7 +99,9 @@ export default function ProjectLibrary() {
 
   // Roll the word over whenever the chosen project changes, and go to that project's depth.
   useEffect(() => {
-    tell('library:depth', depthOf(active));
+    tell('library:depth', floor ? 1 : depthOf(active));
+  }, [active, floor]);
+  useEffect(() => {
     if (shown.current === active) return;
     shown.current = active;
     sound('bubble', 0.8);
@@ -234,8 +245,18 @@ export default function ProjectLibrary() {
     let gathered = 0, lastPush = 0, quietUntil = 0;
     let start: { id: number; x: number; y: number } | null = null;
     const step = (way: number) => {
-      if (focusRef.current !== null) return;
+      if (focusRef.current !== null || writing.current) return;
       const current = activeRef.current;
+      // Past the last project is the pond floor; up from there, back to the projects.
+      if (floorRef.current) {
+        if (way < 0) setFloor(false);
+        return;
+      }
+      if (way > 0 && current === projects.length - 1) {
+        setFloor(true);
+        sound('bubble', 0.6);
+        return;
+      }
       if (way > 0) {
         const index = current === null ? 0 : Math.min(projects.length - 1, current + 1);
         if (index !== current) choose(index, false);
@@ -268,6 +289,7 @@ export default function ProjectLibrary() {
       else if (Math.abs(dx) > 40) sideways(dx < 0 ? 1 : -1);
     };
     const onKey = (event: KeyboardEvent) => {
+      if (writing.current) return;
       const isOpen = focusRef.current !== null;
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -376,7 +398,7 @@ export default function ProjectLibrary() {
   const title = shownProject ? Array.from(shownProject.title.toUpperCase()) : [];
 
   return (
-    <div ref={page} className="plib" data-focus={focus !== null && !closing}>
+    <div ref={page} className="plib" data-focus={focus !== null && !closing} data-floor={floor}>
       <Link href="/" scroll={false} className="plib__back">
         <span aria-hidden="true">←</span> Back to the pond
       </Link>
@@ -455,6 +477,23 @@ export default function ProjectLibrary() {
           );
         })}
       </div>
+
+      <button
+        type="button"
+        className="plib__down"
+        data-visible={!floor && focus === null}
+        tabIndex={!floor && focus === null ? 0 : -1}
+        onClick={() => {
+          setFloor(true);
+          sound('bubble', 0.6);
+        }}
+      >
+        Scroll down to leave a note
+        <svg viewBox="0 0 12 12" aria-hidden="true">
+          <path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <NoteShell shown={floor} onOpenChange={onNoteOpen} />
 
       {shownProject && focus !== null && (
         <div className="plib__focus" data-closing={closing} role="dialog" aria-modal="true" aria-label={shownProject.title}>

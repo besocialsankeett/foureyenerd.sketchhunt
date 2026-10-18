@@ -1989,3 +1989,376 @@ html[data-mood='night'] .cursor__bubble {
   filter: drop-shadow(0 0 5px rgba(150, 230, 255, 0.85));
 }
 
+
+/* ---- The pond floor under the library, and the shell that takes notes ---- */
+
+.plib__row,
+.plib__band {
+  transition:
+    opacity 0.6s ease,
+    transform 0.8s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.plib[data-floor='true'] :is(.plib__row, .plib__band) {
+  opacity: 0;
+  transform: translateY(-40vh);
+  pointer-events: none;
+}
+
+/* The glass hint at the bottom of the library. */
+.plib__down {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 14px));
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 10px 30px rgba(6, 30, 52, 0.3);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(6, 30, 52, 0.4);
+  white-space: nowrap;
+  cursor: pointer;
+  translate: -50% 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s ease,
+    translate 0.5s ease,
+    background 0.25s ease;
+}
+
+.plib__down[data-visible='true'] {
+  opacity: 1;
+  translate: -50% 0;
+  pointer-events: auto;
+}
+
+.plib__down:hover,
+.plib__down:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+  outline: none;
+}
+
+.plib__down svg {
+  width: 14px;
+  height: 14px;
+  animation: note-bob 1.8s ease-in-out infinite;
+}
+
+@keyframes note-bob {
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* The shell, resting low in the middle of the floor. */
+.note {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: max(10vh, calc(env(safe-area-inset-bottom) + 40px));
+  opacity: 0;
+  transform: translateY(30vh);
+  pointer-events: none;
+  transition:
+    opacity 0.6s ease,
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.note[data-shown='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+.note[data-shown='true'] > :not(.note__card) {
+  pointer-events: auto;
+}
+
+.note__shell {
+  position: relative;
+  width: min(48vw, 34vh, 280px);
+  aspect-ratio: 636 / 683;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 0 18px rgba(255, 214, 190, 0.45));
+  animation: note-breathe 4s ease-in-out infinite;
+  transition: opacity 0.3s ease;
+}
+
+.note__shell:focus-visible {
+  outline: 2px dashed rgba(255, 255, 255, 0.7);
+  outline-offset: 8px;
+  border-radius: 24px;
+}
+
+@keyframes note-breathe {
+  50% {
+    transform: translateY(-4px) scale(1.015);
+    filter: drop-shadow(0 0 30px rgba(255, 220, 200, 0.7));
+  }
+}
+
+.note__shell img {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  translate: -50% 0;
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s cubic-bezier(0.3, 1.4, 0.5, 1);
+  user-select: none;
+}
+
+.note__closed {
+  width: 97% !important;
+}
+
+.note__open {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.note[data-stage='sent'] .note__closed {
+  opacity: 0;
+  transform: scale(1.06);
+}
+
+.note[data-stage='sent'] .note__open {
+  opacity: 1;
+  transform: none;
+}
+
+/* While a note is being written, the shell waits dimly behind it. */
+.note:is([data-stage='open'], [data-stage='sending']) .note__shell {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* The pearl's glow, once a note has been sent. */
+.note__pearl {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 236, 250, 0.6) 35%, rgba(200, 230, 255, 0) 70%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease 0.3s;
+}
+
+.note[data-stage='sent'] .note__pearl {
+  opacity: 1;
+  animation: note-pearl 2.6s ease-in-out infinite;
+}
+
+@keyframes note-pearl {
+  50% {
+    transform: scale(1.35);
+    filter: brightness(1.2);
+  }
+}
+
+.note__tap {
+  margin: 14px 0 0;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgba(6, 30, 52, 0.4);
+  pointer-events: none !important;
+  transition: opacity 0.3s ease;
+}
+
+.note:is([data-stage='open'], [data-stage='sending']) .note__tap {
+  opacity: 0;
+}
+
+/* The note: a card of cream paper with ruled lines, in the page's dark-red ink. */
+.note__card {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(88vw, 380px);
+  padding: 22px 20px 18px;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  background: #f8f1dd;
+  box-shadow: 0 5px 0 rgba(74, 21, 18, 0.3), 0 20px 50px rgba(6, 30, 52, 0.4);
+  color: var(--ink);
+  translate: -50% -50%;
+  rotate: -1deg;
+  pointer-events: auto;
+  animation: note-rise 0.6s cubic-bezier(0.2, 0.9, 0.25, 1.1) both;
+}
+
+@keyframes note-rise {
+  from {
+    opacity: 0;
+    transform: translateY(30%) scale(0.3);
+  }
+}
+
+.note__head {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.note__card textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 2px 2px 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: repeating-linear-gradient(transparent 0 27px, rgba(74, 21, 18, 0.18) 27px 28px);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 28px;
+  touch-action: auto;
+}
+
+.note__card textarea::placeholder {
+  color: rgba(74, 21, 18, 0.45);
+}
+
+.note__trap {
+  position: absolute;
+  left: -9999px;
+}
+
+.note__close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 36px;
+  height: 36px;
+  padding: 0 0 3px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: #f8f1dd;
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.28);
+  color: var(--ink);
+  font: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.note__stamp {
+  position: absolute;
+  top: 10px;
+  right: 22px;
+  font-size: 30px;
+  rotate: 12deg;
+  animation: note-stamp 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+@keyframes note-stamp {
+  from {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.note__stickers {
+  display: flex;
+  gap: 8px;
+}
+
+.note__stickers button {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(74, 21, 18, 0.35);
+  border-radius: 50%;
+  background: #fffaf0;
+  font-size: 19px;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.note__stickers button[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: #ffe566;
+  transform: scale(1.08) rotate(-6deg);
+}
+
+.note__error {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #a3261b;
+}
+
+.note__send {
+  align-self: flex-end;
+  padding: 10px 20px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #ffe566;
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.3);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.note__send:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.note__send:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note__shell,
+  .note__pearl,
+  .note__card,
+  .note__stamp,
+  .plib__down svg {
+    animation: none !important;
+  }
+}

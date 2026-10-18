@@ -2245,18 +2245,15 @@ html[data-mood='night'] .cursor__bubble {
   opacity: 0;
 }
 
-.note[data-stage='sent'] .note__closed {
+.note:not([data-stage='closed']) .note__closed {
   opacity: 0;
 }
 
-.note[data-stage='sent'] .note__open {
+.note:not([data-stage='closed']) .note__open {
   opacity: 1;
 }
 
-/* Tapped, it gives a little shake as the note slips out. */
-.note[data-stage='open'] .note__closed {
-  animation: note-rattle 0.45s ease-in-out;
-}
+
 
 @keyframes note-rattle {
   25% {
@@ -2272,9 +2269,9 @@ html[data-mood='night'] .cursor__bubble {
   }
 }
 
-/* The thank-you: the closed shell shakes, squeezes down, and springs open on its hinge,
-   showing the pearl, which lights up. */
-.note[data-opening='true'] .note__closed {
+/* Tapped, the closed shell shakes, squeezes down, and springs open on its hinge, with a
+   rolled-up note lying in it. */
+.note[data-stage='open'] .note__closed {
   animation: note-unlatch 0.9s ease-in both;
 }
 
@@ -2310,7 +2307,7 @@ html[data-mood='night'] .cursor__bubble {
   }
 }
 
-.note[data-opening='true'] .note__open {
+.note[data-stage='open'] .note__open {
   animation: note-spring 0.75s cubic-bezier(0.3, 1.5, 0.5, 1) 0.7s both;
 }
 
@@ -2330,10 +2327,47 @@ html[data-mood='night'] .cursor__bubble {
   }
 }
 
-/* While a note is being written, the shell waits dimly behind it. */
 .note:is([data-stage='open'], [data-stage='sending']) .note__shell {
-  opacity: 0.45;
   cursor: default;
+}
+
+/* The rolled note lying in the open shell, over the pearl, until it is sent. */
+.note__scroll {
+  position: absolute;
+  z-index: 1;
+  height: 11%;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffaf0 0 45%, #eadcb8 100%);
+  box-shadow: 0 2px 0 rgba(74, 21, 18, 0.25);
+  translate: -50% -60%;
+  rotate: -8deg;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.note__scroll::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  bottom: 15%;
+  left: 30%;
+  width: 12%;
+  background: #ffe566;
+  border-left: 1.5px solid var(--ink);
+  border-right: 1.5px solid var(--ink);
+}
+
+.note:is([data-stage='open'], [data-stage='sending']) .note__scroll {
+  opacity: 1;
+  animation: note-scroll-in 0.35s ease 0.72s both;
+}
+
+@keyframes note-scroll-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
 }
 
 /* The pearl's glow, once a note has been sent. */
@@ -2430,7 +2464,7 @@ html[data-mood='night'] .cursor__bubble {
   translate: -50% -50%;
   rotate: -1deg;
   pointer-events: auto;
-  animation: note-rise 0.6s cubic-bezier(0.2, 0.9, 0.25, 1.1) both;
+  animation: note-rise 0.6s cubic-bezier(0.2, 0.9, 0.25, 1.1) 1.3s both;
 }
 
 @keyframes note-rise {
@@ -2570,6 +2604,7 @@ html[data-mood='night'] .cursor__bubble {
   .note__shell img,
   .note__tap,
   .note__pearl,
+  .note__scroll,
   .note__card,
   .note__stamp,
   .plib__down svg {

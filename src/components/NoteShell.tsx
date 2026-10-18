@@ -139,6 +139,11 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
         <img className="note__open" src={manifest.shell.open.file} alt="" draggable={false} />
         <span className="note__puff" aria-hidden="true" />
         <span
+          className="note__scroll"
+          aria-hidden="true"
+          style={{ left: `${pearl.x * 100}%`, top: `${pearl.y * 100}%`, width: `${pearl.r * 340}%` }}
+        />
+        <span
           className="note__pearl"
           aria-hidden="true"
           style={{ left: `${pearl.x * 100}%`, top: `${pearl.y * 100}%`, width: `${pearl.r * 200}%` }}

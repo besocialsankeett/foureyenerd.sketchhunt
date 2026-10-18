@@ -12,6 +12,7 @@ import type { Phase } from '@/scene/fishing';
 import CaseStudy from './CaseStudy';
 import Cursor from './Cursor';
 import Intro from './Intro';
+import ThankYou from './ThankYou';
 
 /** Outline icons for the places to find him, drawn like the rest of the page's line work. */
 const ICONS: Record<string, React.ReactNode> = {
@@ -377,6 +378,7 @@ export default function Sketchbook() {
         </svg>
         <span className="sound__label">Sound is {soundOn ? 'on' : 'off'}</span>
       </button>
+      <ThankYou engine={engineRef} pond={ready && reading < 0 && !browsing} />
       <nav className="socials" aria-label="Find me elsewhere" data-visible={ready && reading < 0 && !browsing}>
         {site.social.map((link) => (
           <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.name} title={link.name}>

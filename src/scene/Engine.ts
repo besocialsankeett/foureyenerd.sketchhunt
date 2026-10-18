@@ -541,6 +541,31 @@ export class Engine {
     else if (!this.paused) this.start();
   };
 
+  /**
+   * A note was left in the shell: a bubble pops at the surface beside the boat, and he is
+   * delighted for a moment.
+   */
+  thank() {
+    const boat = this.boat;
+    if (!boat || !this.fishing) return;
+    const x = boat.hullEnds[1] + 70, y = boat.waterY - 6;
+    this.ripple(x, y, 0.06, 0.7);
+    this.droplets?.burst(x, y, 10, 260, 20);
+    this.fishing.cheer(this.time + 3);
+  }
+
+  /** Where on the screen, at the surface, the thank-you bubble pops: just past the boat's bow. */
+  thanksPoint() {
+    const boat = this.boat;
+    if (!boat) return null;
+    const x = boat.hullEnds[1] + 70, y = boat.waterY - 6;
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      x: rect.left + ((x - this.view.left) / this.view.width) * rect.width,
+      y: rect.top + (1 - (y - this.view.bottom) / this.view.height) * rect.height,
+    };
+  }
+
   /** While a page covers the whole pond, there is no need to draw it. */
   private paused = false;
   setPaused(paused: boolean) {

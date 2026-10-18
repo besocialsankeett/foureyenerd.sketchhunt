@@ -232,6 +232,11 @@ export class Fishing {
     this.floatMaterial.uniforms.uClip.value = clipFloat ? 1 : 0;
   }
 
+  /** He is delighted until then, while idle. */
+  cheer(until: number) {
+    this.cheerUntil = until;
+  }
+
   update(dt: number, time: number, puppet: Puppet, boat: Boat) {
     this.clock += dt;
     boat.group.updateMatrixWorld();

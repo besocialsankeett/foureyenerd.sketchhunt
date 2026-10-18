@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { Sfx } from '@/audio/sound';
 import { site } from '@/content/site';
@@ -24,7 +25,11 @@ type Stage = 'closed' | 'open' | 'sending' | 'sent';
  * rolls up into a bubble and floats away, and the pearl it hid is left glowing as a thank-you.
  */
 export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onOpenChange: (open: boolean) => void }) {
+  const router = useRouter();
   const [stage, setStage] = useState<Stage>('closed');
+  /** On the way back up to the pond with the pearl, after a note was sent. */
+  const [rising, setRising] = useState(false);
+  const pearlRef = useRef<HTMLSpanElement>(null);
   const [sticker, setSticker] = useState<string | null>(null);
   const [error, setError] = useState('');
   /** The shell is springing open over its pearl, just now, for a note that was sent. */
@@ -100,15 +105,35 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
       localStorage.setItem(LEFT, '1');
     } catch {}
     sound('bubble', 1);
-    const done = () => {
-      setStage('sent');
-      setOpening(true);
-      setSticker(null);
-      shell.current?.focus({ preventScroll: true });
+    // The thank-you: the note floats off as a bubble and the shell shows its pearl; then the
+    // pearl lifts out and carries the view back up to the pond.
+    setStage('sent');
+    setOpening(true);
+    setSticker(null);
+    const handOff = () => {
+      const spot = pearlRef.current?.getBoundingClientRect();
+      const box = shell.current?.getBoundingClientRect();
+      let detail = null;
+      if (spot && box && !reduced()) {
+        const width = spot.width / (2 * pearl.r), height = (width * manifest.shell.open.h) / manifest.shell.open.w;
+        detail = {
+          x: spot.left + spot.width / 2,
+          y: spot.top + spot.height / 2,
+          size: spot.width,
+          image: manifest.shell.open.file,
+          backgroundSize: `${width}px ${height}px`,
+          backgroundPosition: `${spot.width / 2 - pearl.x * width}px ${spot.height / 2 - pearl.y * height}px`,
+        };
+      }
+      window.dispatchEvent(new CustomEvent('sketchbook:thanks', { detail }));
+      window.dispatchEvent(new CustomEvent('library:depth', { detail: 0 }));
+      setRising(true);
+      setTimeout(() => router.push('/', { scroll: false }), 600);
     };
-    if (!card.current || reduced()) return done();
+    if (!card.current || reduced()) return handOff();
+    setTimeout(handOff, 1400);
     // Rolled up into a bubble that floats off to the surface.
-    card.current
+    void card.current
       .animate(
         [
           { transform: 'none', borderRadius: '14px', opacity: 1 },
@@ -117,11 +142,11 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
         ],
         { duration: 1300, easing: 'cubic-bezier(0.45, 0, 0.3, 1)', fill: 'forwards' },
       )
-      .finished.then(done, done);
+      .finished.catch(() => {});
   };
 
   return (
-    <div className="note" data-shown={shown} data-stage={stage} data-opening={opening}>
+    <div className="note" data-shown={shown} data-stage={stage} data-opening={opening} data-rising={rising}>
       <p className="note__tap" aria-hidden="true">
         {stage === 'sent' ? 'Thank you! Tap to leave another' : 'Tap to open'}
       </p>
@@ -144,6 +169,7 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
           style={{ left: `${pearl.x * 100}%`, top: `${pearl.y * 100}%`, width: `${pearl.r * 340}%` }}
         />
         <span
+          ref={pearlRef}
           className="note__pearl"
           aria-hidden="true"
           style={{ left: `${pearl.x * 100}%`, top: `${pearl.y * 100}%`, width: `${pearl.r * 200}%` }}

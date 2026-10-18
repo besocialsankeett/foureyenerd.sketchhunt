@@ -1,7 +1,7 @@
 'use client';
 
 import { Caveat } from 'next/font/google';
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import type { Engine } from '@/scene/Engine';
 
 /** A hand-lettered face for the line of thanks. */
@@ -15,12 +15,13 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /**
  * After a note is sent: the bubble the note rolled into floats up, and the view follows it
  * back up to the pond. It comes up just past the boat's bow and pops there; he is delighted,
- * and a short handwritten line of thanks shows and fades.
+ * and says thank you in a comic speech bubble.
  */
 export default function ThankYou({ engine }: { engine: RefObject<Engine | null> }) {
   const bubble = useRef<HTMLDivElement>(null);
   const [from, setFrom] = useState<ThanksDetail>(null);
-  const [line, setLine] = useState(false);
+  /** Where his speech bubble points to: the top of his head, on the screen. */
+  const [line, setLine] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const onThanks = (event: Event) => setFrom((event as CustomEvent<ThanksDetail>).detail ?? { x: 0, y: 0, size: 0 });
@@ -71,9 +72,10 @@ export default function ThankYou({ engine }: { engine: RefObject<Engine | null> 
       engine.current?.thank();
       window.dispatchEvent(new CustomEvent('sketchbook:sound', { detail: { name: 'drip', amount: 0.8 } }));
       setFrom(null);
-      setLine(true);
-      await wait(2600);
-      if (!gone) setLine(false);
+      const head = engine.current?.speechPoint() ?? { x: window.innerWidth / 2, y: window.innerHeight * 0.35 };
+      setLine(head);
+      await wait(2800);
+      if (!gone) setLine(null);
     };
     void run();
     return () => {
@@ -91,9 +93,25 @@ export default function ThankYou({ engine }: { engine: RefObject<Engine | null> 
           style={{ width: from.size, height: from.size, transform: `translate(${from.x - from.size / 2}px, ${from.y - from.size / 2}px)` }}
         />
       )}
-      <p className={`thanks__line ${hand.className}`} data-visible={line} role="status">
-        {line ? 'note received, thank you!' : ''}
+      <p className="visually-hidden" role="status">
+        {line ? 'Note received, thank you!' : ''}
       </p>
+      {line && (
+        <div
+          className="thanks__say"
+          aria-hidden="true"
+          style={
+            {
+              // Kept on the screen; the tail still points at his head.
+              left: Math.min(window.innerWidth - 150, Math.max(150, line.x)),
+              top: line.y,
+              '--tail': `${line.x - Math.min(window.innerWidth - 150, Math.max(150, line.x))}px`,
+            } as CSSProperties
+          }
+        >
+          <p className={hand.className}>note received, thank you!</p>
+        </div>
+      )}
     </>
   );
 }

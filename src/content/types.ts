@@ -23,7 +23,7 @@ export type Project = {
   kind: string;
   /** The object this project comes out of the water as. Without one, the project is in the
    * library and has its case study, but no marker on the pond. */
-  catch?: 'mirror' | 'box' | 'bottle' | 'globe' | 'guitar';
+  catch?: 'mirror' | 'box' | 'bottle' | 'globe' | 'musicbox';
   /** One or two sentences: what it is. Also used when the page is shared. */
   summary: string;
   facts: { label: string; value: string }[];

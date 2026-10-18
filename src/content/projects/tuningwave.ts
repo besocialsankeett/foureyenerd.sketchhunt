@@ -6,7 +6,7 @@ export const tuningwave: Project = {
   slug: 'the-tuning-wave',
   title: 'The Tuning Wave',
   kind: 'Concept website · Design',
-  catch: 'guitar',
+  catch: 'musicbox',
   summary: 'An instrument shop where you play before you pay: drums, a guitar and a grand piano you can hear before you buy.',
   facts: [
     { label: 'Role', value: 'Designed the whole website, built with vibe coding' },

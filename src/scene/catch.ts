@@ -5,8 +5,8 @@ import type { Part } from './puppet';
 import { REFLECT_LAYER, createSpriteMaterial, type SpriteShared } from './sprite';
 import { GLOBE, INDIA_SPIN, globeMaterial, standPart } from './globe';
 
-export type CatchKind = 'mirror' | 'box' | 'bottle' | 'globe' | 'guitar';
-export type CatchTextures = Record<'mirror' | 'box' | 'drawer' | 'bottle' | 'cork' | 'note' | 'globe' | 'guitar', Part>;
+export type CatchKind = 'mirror' | 'box' | 'bottle' | 'globe' | 'musicbox';
+export type CatchTextures = Record<'mirror' | 'box' | 'drawer' | 'bottle' | 'cork' | 'note' | 'globe' | 'musicbox' | 'musiclid' | 'musicnotes', Part>;
 
 /** How tall each catch stands in the scene, and how heavy it feels on the line. */
 const SPEC: Record<CatchKind, { height: number; weight: number }> = {
@@ -14,7 +14,7 @@ const SPEC: Record<CatchKind, { height: number; weight: number }> = {
   box: { height: 84, weight: 1 },
   bottle: { height: 100, weight: 0.7 },
   globe: { height: GLOBE.height, weight: 1.2 },
-  guitar: { height: 230, weight: 1.4 },
+  musicbox: { height: 100, weight: 1.1 },
 };
 
 /** Draw order while it is out over the water, and once it is inside the boat. */
@@ -45,6 +45,10 @@ export class Catch {
   private note: THREE.Mesh;
   private corkMaterial: THREE.ShaderMaterial;
   private corkAbove: number;
+  /** The music box's lid, on its hinge, and the notes that come out; where the box's top is. */
+  private lid: THREE.Group;
+  private notes: THREE.Mesh;
+  private musicTop: number;
 
   /** The globe's ball: how far it has turned, how fast, and where a spin should stop. */
   private globeMaterial: THREE.ShaderMaterial;
@@ -94,8 +98,23 @@ export class Catch {
     const bottleScale = (SPEC.bottle.height - corkAbove) / textures.bottle.h;
 
     const mirror = new THREE.Group().add(sprite(textures.mirror, mirrorScale, 0, 0));
-    const guitarScale = SPEC.guitar.height / textures.guitar.h;
-    const guitar = new THREE.Group().add(sprite(textures.guitar, guitarScale, 0, 0));
+    // The music box, measured on its sheet: the closed lid's top is the top of it all, the box
+    // starts 80 below that and the lid's bottom edge 202 below it, and the box's own middle is
+    // 8.5 left of its picture's middle (the key sticks out on the right, the weed on the left).
+    const musicScale = SPEC.musicbox.height / (80 + textures.musicbox.h);
+    const lidWidth = textures.musiclid.w * musicScale;
+    const lid = sprite(textures.musiclid, musicScale, -lidWidth / 2, textures.musiclid.h * musicScale, 0.002);
+    // Hinged at its right end, so its left end swings up.
+    this.lid = new THREE.Group().add(lid);
+    this.lid.position.set(lidWidth / 2, -202 * musicScale, 0);
+    this.notes = sprite(textures.musicnotes, 44 / textures.musicnotes.h, 0, 0, 0.001);
+    this.notes.visible = false;
+    const musicbox = new THREE.Group().add(
+      sprite(textures.musicbox, musicScale, 8.5 * musicScale, -80 * musicScale),
+      this.notes,
+      this.lid,
+    );
+    this.musicTop = -80 * musicScale;
     // The box image includes its ribbon tab on the right; hang it from the middle of the box.
     // Its drawer sits behind it and slides out sideways when it opens.
     this.drawer = sprite(textures.drawer, boxScale, 3.2, 0, -0.002);
@@ -116,13 +135,13 @@ export class Catch {
     this.meshes.push(ball);
     this.materials.push(this.globeMaterial);
     const globe = new THREE.Group().add(sprite(standPart(), 0.5, 0, 0), ball);
-    this.bodies = { mirror, box, bottle, globe, guitar };
+    this.bodies = { mirror, box, bottle, globe, musicbox };
     this.width = {
       mirror: textures.mirror.w * mirrorScale,
       box: textures.box.w * boxScale,
       bottle: textures.bottle.w * bottleScale,
       globe: GLOBE.width * 0.75,
-      guitar: textures.guitar.w * guitarScale,
+      musicbox: textures.musicbox.w * musicScale,
     };
     for (const body of Object.values(this.bodies)) {
       body.visible = false;
@@ -184,9 +203,12 @@ export class Catch {
     this.note.scale.setScalar(0.3 + 0.7 * t);
     // The mirror has no moving parts: it swells a little as it opens.
     this.bodies.mirror.scale.setScalar(1 + 0.05 * t + 0.25 * t * (1 - t));
-    // The guitar rocks once, as if strummed, and swells a little.
-    this.bodies.guitar.scale.setScalar(1 + 0.04 * t + 0.2 * t * (1 - t));
-    this.bodies.guitar.rotation.z = Math.sin(t * Math.PI * 2) * 0.08 * (1 - t);
+    // The music box's lid swings up from the left, and the notes float up out of the box.
+    this.lid.rotation.z = -Math.min(1, t) * 1.05;
+    this.notes.visible = shown;
+    this.notes.position.set(-12 - 14 * t, this.musicTop + 10 + t * 70, 0);
+    this.notes.scale.setScalar(0.3 + 0.7 * Math.min(1, t));
+    this.notes.rotation.z = (1 - Math.min(1, t)) * 0.4;
   }
 
   /** No more dripping: it has been sitting in the boat a while. */

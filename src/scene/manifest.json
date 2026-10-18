@@ -172,10 +172,20 @@
       "w": 570,
       "h": 1401
     },
-    "guitar": {
-      "file": "/scene/catch-guitar.webp",
-      "w": 440,
-      "h": 1365
+    "musicbox": {
+      "file": "/scene/catch-musicbox.webp",
+      "w": 476,
+      "h": 347
+    },
+    "musiclid": {
+      "file": "/scene/catch-musiclid.webp",
+      "w": 432,
+      "h": 202
+    },
+    "musicnotes": {
+      "file": "/scene/catch-musicnotes.webp",
+      "w": 240,
+      "h": 247
     },
     "box": {
       "file": "/scene/catch-box.webp",

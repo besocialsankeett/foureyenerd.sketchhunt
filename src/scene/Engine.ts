@@ -17,7 +17,7 @@ import { lightAt, loopHour, moodOf, type Light } from './daylight';
 import { Fireflies } from './fireflies';
 import { Water } from './water';
 
-const CATCH_PARTS = ['mirror', 'box', 'drawer', 'bottle', 'cork', 'note', 'globe', 'guitar'] as const;
+const CATCH_PARTS = ['mirror', 'box', 'drawer', 'bottle', 'cork', 'note', 'globe', 'musicbox', 'musiclid', 'musicnotes'] as const;
 const SIM_STEP = 1 / 60;
 const MAX_PIXEL_RATIO = 2;
 /**

@@ -637,13 +637,22 @@ let skin, shade, stub;
 {
   const byX = (a, b) => a.box.x - b.box.x;
   const mirror = stripHaze(await loadRaw(path.join(SRC, 'catch-mirror.webp')));
-  // The Tuning Wave's electric guitar, dripping, with pond weed round its neck.
-  const guitar = clearWhite(stripHaze(await loadRaw(path.join(SRC, 'catch-guitar.webp'))));
+  // The Tuning Wave's music box: on its sheet, left to right, the box without its lid, the lid,
+  // and the music notes that come out of it.
+  const musicSheet = stripHaze(await loadRaw(path.join(SRC, 'catch-musicbox.webp')));
+  const musicPiece = (x0, x1) => {
+    const side = crop(musicSheet, { x: x0, y: 0, w: x1 - x0, h: musicSheet.height });
+    return crop(side, bounds(side));
+  };
+  // The notes' soft glow comes out grey on the water: only the notes themselves are kept.
+  for (let i = 3; i < musicSheet.data.length; i += 4) if ((i >> 2) % musicSheet.width >= 1120 && musicSheet.data[i] < 215) musicSheet.data[i] = 0;
   const [box, drawer] = sprites(stripHaze(await loadRaw(path.join(SRC, 'catch-kika.webp')))).sort(byX);
   const [bottle, cork, note] = sprites(stripHaze(await loadRaw(path.join(SRC, 'catch-bottle.webp')))).sort(byX);
   manifest.catches = {
     mirror: await save(crop(mirror, bounds(mirror)), 'catch-mirror.webp'),
-    guitar: await save(crop(guitar, bounds(guitar)), 'catch-guitar.webp'),
+    musicbox: await save(musicPiece(0, 590), 'catch-musicbox.webp'),
+    musiclid: await save(musicPiece(590, 1120), 'catch-musiclid.webp'),
+    musicnotes: await save(musicPiece(1120, 1536), 'catch-musicnotes.webp'),
     box: await save(box.image, 'catch-box.webp'),
     drawer: await save(drawer.image, 'catch-drawer.webp'),
     bottle: await save(bottle.image, 'catch-bottle.webp'),

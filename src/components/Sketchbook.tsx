@@ -378,7 +378,7 @@ export default function Sketchbook() {
         </svg>
         <span className="sound__label">Sound is {soundOn ? 'on' : 'off'}</span>
       </button>
-      <ThankYou engine={engineRef} pond={ready && reading < 0 && !browsing} />
+      <ThankYou engine={engineRef} />
       <nav className="socials" aria-label="Find me elsewhere" data-visible={ready && reading < 0 && !browsing}>
         {site.social.map((link) => (
           <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.name} title={link.name}>

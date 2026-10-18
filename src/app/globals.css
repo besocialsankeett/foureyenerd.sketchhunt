@@ -2630,27 +2630,19 @@ html[data-mood='night'] .cursor__bubble {
   }
 }
 
-/* The pearl itself, cut from the shell's picture, glowing like a lantern. */
-.thanks__pearl {
+/* The note, rolled up into a bubble on its way to the surface. */
+.thanks__bubble {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 6;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
   border-radius: 50%;
-  background-repeat: no-repeat;
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.85) 0 9%, rgba(255, 255, 255, 0.12) 22%, rgba(190, 230, 255, 0.08) 60%, rgba(255, 255, 255, 0.3) 100%);
   box-shadow:
-    0 0 18px 6px rgba(255, 246, 230, 0.75),
-    0 0 60px 20px rgba(255, 220, 240, 0.35);
+    inset 0 0 10px rgba(255, 255, 255, 0.35),
+    0 0 14px rgba(200, 235, 255, 0.35);
   pointer-events: none;
-  animation: thanks-shine 1.2s ease-in-out infinite alternate;
-}
-
-@keyframes thanks-shine {
-  to {
-    box-shadow:
-      0 0 26px 10px rgba(255, 250, 238, 0.9),
-      0 0 90px 30px rgba(255, 226, 244, 0.45);
-  }
 }
 
 .thanks__line {
@@ -2660,75 +2652,36 @@ html[data-mood='night'] .cursor__bubble {
   top: 30vh;
   z-index: 6;
   margin: 0;
-  color: #f8f1dd;
-  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
-  font-size: clamp(22px, 4.4vw, 40px);
-  font-weight: 900;
-  letter-spacing: 0.01em;
+  color: var(--ink);
+  font-size: clamp(28px, 5.4vw, 40px);
+  line-height: 1.1;
   text-align: center;
   text-shadow:
-    0 3px 0 var(--ink),
-    0 0 1px var(--ink),
-    0 6px 18px rgba(6, 30, 52, 0.4);
-  -webkit-text-stroke: 1.5px var(--ink);
-  paint-order: stroke fill;
+    0 0 6px rgba(255, 248, 232, 0.95),
+    0 0 18px rgba(255, 244, 222, 0.8);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.6s ease;
+  transition: opacity 0.8s ease;
 }
 
 .thanks__line[data-visible='true'] {
   opacity: 1;
+  animation: thanks-write 0.9s ease-out both;
 }
 
-.thanks__line span {
-  display: inline-block;
-  white-space: pre;
-  animation: thanks-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) var(--delay) both;
-}
-
-@keyframes thanks-pop {
+/* Written in from left to right, like a pen going along. */
+@keyframes thanks-write {
   from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.6);
+    clip-path: inset(0 100% 0 0);
   }
-}
 
-/* The pearl, staying in the pond's sky as a small twinkling star. */
-.thanks__star {
-  position: fixed;
-  left: 86%;
-  top: 22%;
-  z-index: 1;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #fffaf2;
-  box-shadow:
-    0 0 8px 3px rgba(255, 246, 230, 0.85),
-    0 0 26px 8px rgba(255, 220, 240, 0.4);
-  translate: -50% -50%;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.6s ease;
-}
-
-.thanks__star[data-visible='true'] {
-  opacity: 1;
-  animation: thanks-twinkle 3s ease-in-out infinite;
-}
-
-@keyframes thanks-twinkle {
-  50% {
-    transform: scale(0.75);
-    opacity: 0.7;
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .thanks__pearl,
-  .thanks__line span,
-  .thanks__star {
+  .thanks__line {
     animation: none !important;
   }
 }

@@ -29,7 +29,6 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
   const [stage, setStage] = useState<Stage>('closed');
   /** On the way back up to the pond with the pearl, after a note was sent. */
   const [rising, setRising] = useState(false);
-  const pearlRef = useRef<HTMLSpanElement>(null);
   const [sticker, setSticker] = useState<string | null>(null);
   const [error, setError] = useState('');
   /** The shell is springing open over its pearl, just now, for a note that was sent. */
@@ -105,44 +104,30 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
       localStorage.setItem(LEFT, '1');
     } catch {}
     sound('bubble', 1);
-    // The thank-you: the note floats off as a bubble and the shell shows its pearl; then the
-    // pearl lifts out and carries the view back up to the pond.
-    setStage('sent');
-    setOpening(true);
-    setSticker(null);
-    const handOff = () => {
-      const spot = pearlRef.current?.getBoundingClientRect();
-      const box = shell.current?.getBoundingClientRect();
-      let detail = null;
-      if (spot && box && !reduced()) {
-        const width = spot.width / (2 * pearl.r), height = (width * manifest.shell.open.h) / manifest.shell.open.w;
-        detail = {
-          x: spot.left + spot.width / 2,
-          y: spot.top + spot.height / 2,
-          size: spot.width,
-          image: manifest.shell.open.file,
-          backgroundSize: `${width}px ${height}px`,
-          backgroundPosition: `${spot.width / 2 - pearl.x * width}px ${spot.height / 2 - pearl.y * height}px`,
-        };
-      }
+    // The thank-you: the note rolls up into a bubble, the view follows it back up to the pond,
+    // and the projects and the shell fall away below.
+    const handOff = (detail: { x: number; y: number; size: number } | null) => {
+      setStage('sent');
+      setOpening(true);
+      setSticker(null);
+      setRising(true);
       window.dispatchEvent(new CustomEvent('sketchbook:thanks', { detail }));
       window.dispatchEvent(new CustomEvent('library:depth', { detail: 0 }));
-      setRising(true);
       setTimeout(() => router.push('/', { scroll: false }), 600);
     };
-    if (!card.current || reduced()) return handOff();
-    setTimeout(handOff, 1400);
-    // Rolled up into a bubble that floats off to the surface.
-    void card.current
-      .animate(
-        [
-          { transform: 'none', borderRadius: '14px', opacity: 1 },
-          { transform: 'scale(0.16)', borderRadius: '50%', opacity: 0.9, offset: 0.35 },
-          { transform: 'translateY(-70vh) scale(0.1)', borderRadius: '50%', opacity: 0 },
-        ],
-        { duration: 1300, easing: 'cubic-bezier(0.45, 0, 0.3, 1)', fill: 'forwards' },
-      )
-      .finished.catch(() => {});
+    const note = card.current;
+    if (!note || reduced()) return handOff(null);
+    const rolled = note.animate(
+      [
+        { transform: 'none', borderRadius: '14px', opacity: 1 },
+        { transform: 'scale(0.14)', borderRadius: '50%', opacity: 0.35 },
+      ],
+      { duration: 550, easing: 'cubic-bezier(0.5, 0, 0.3, 1)', fill: 'forwards' },
+    );
+    rolled.finished.then(() => {
+      const box = note.getBoundingClientRect();
+      handOff({ x: box.left + box.width / 2, y: box.top + box.height / 2, size: Math.max(28, Math.min(box.width, box.height)) });
+    }, () => handOff(null));
   };
 
   return (
@@ -169,7 +154,6 @@ export default function NoteShell({ shown, onOpenChange }: { shown: boolean; onO
           style={{ left: `${pearl.x * 100}%`, top: `${pearl.y * 100}%`, width: `${pearl.r * 340}%` }}
         />
         <span
-          ref={pearlRef}
           className="note__pearl"
           aria-hidden="true"
           style={{ left: `${pearl.x * 100}%`, top: `${pearl.y * 100}%`, width: `${pearl.r * 200}%` }}

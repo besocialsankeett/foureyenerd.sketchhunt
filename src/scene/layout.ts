@@ -96,7 +96,7 @@ export const TAG_SPOTS = {
 
 /**
  * Where the project markers float. On a narrow screen they sit in two neat rows of two in the
- * open water below the boat, placed by the share of the screen so none is cut off at an edge.
+ * open water below the boat, low enough to leave its reflection clear, placed by the share of the screen so none is cut off at an edge.
  */
 export const tagSpots = (view: View, pixelHeight = 1000): Point[] => {
   // A short landscape screen, like a phone on its side: the markers would crowd each other at
@@ -110,11 +110,11 @@ export const tagSpots = (view: View, pixelHeight = 1000): Point[] => {
   const row = (share: number) => BOAT.waterY + (bottom - BOAT.waterY) * share;
   const column = (share: number) => view.left + view.width * share;
   return [
-    [column(0.28), row(0.18)],
-    [column(0.72), row(0.18)],
-    [column(0.28), row(0.42)],
-    [column(0.72), row(0.42)],
-    [column(0.5), row(0.64)],
+    [column(0.28), row(0.34)],
+    [column(0.72), row(0.34)],
+    [column(0.28), row(0.54)],
+    [column(0.72), row(0.54)],
+    [column(0.5), row(0.74)],
   ];
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import type { Engine } from '@/scene/Engine';
 
 /** Where on the screen the note's bubble was when the view began to rise, and its size. */
@@ -11,13 +11,15 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /**
  * After a note is sent: the bubble the note rolled into floats up, and the view follows it
  * back up to the pond. It comes up just past the boat's bow and pops there; he is delighted,
- * and pumps his fists, with a soft ding.
+ * pumps his fists and says thank you in a speech bubble, with a soft ding.
  */
 export default function ThankYou({ engine }: { engine: RefObject<Engine | null> }) {
   const bubble = useRef<HTMLDivElement>(null);
   const [from, setFrom] = useState<ThanksDetail>(null);
   /** Said to screen readers, since the thanks itself is only his face and his cheer. */
   const [said, setSaid] = useState(false);
+  /** Where his speech bubble points: the top of his head, on the screen. */
+  const [say, setSay] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const onThanks = (event: Event) => setFrom((event as CustomEvent<ThanksDetail>).detail ?? { x: 0, y: 0, size: 0 });
@@ -28,6 +30,10 @@ export default function ThankYou({ engine }: { engine: RefObject<Engine | null> 
   useEffect(() => {
     if (!from) return;
     let gone = false;
+    // The rest of the pond waits until his cheer is over.
+    document.documentElement.dataset.thanks = 'true';
+    // However it ends, never for longer than the whole thank-you takes.
+    const giveBack = setTimeout(() => delete document.documentElement.dataset.thanks, 9000);
     const run = async () => {
       const element = bubble.current;
       const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -70,7 +76,11 @@ export default function ThankYou({ engine }: { engine: RefObject<Engine | null> 
       // A soft ding a beat after the pop.
       setTimeout(() => window.dispatchEvent(new CustomEvent('sketchbook:sound', { detail: { name: 'ding', amount: 0.35 } })), 350);
       setTimeout(() => setSaid(false), 4000);
+      setSay(engine.current?.speechPoint() ?? { x: window.innerWidth / 2, y: window.innerHeight * 0.35 });
+      setTimeout(() => setSay(null), 3400);
       setSaid(true);
+      clearTimeout(giveBack);
+      setTimeout(() => delete document.documentElement.dataset.thanks, 3200);
       setFrom(null);
     };
     void run();
@@ -88,6 +98,22 @@ export default function ThankYou({ engine }: { engine: RefObject<Engine | null> 
           aria-hidden="true"
           style={{ width: from.size, height: from.size, transform: `translate(${from.x - from.size / 2}px, ${from.y - from.size / 2}px)` }}
         />
+      )}
+      {say && (
+        // Kept on the screen, its tail still pointing down at his head.
+        <div
+          className="thanks__say"
+          aria-hidden="true"
+          style={
+            {
+              left: Math.min(window.innerWidth - 130, Math.max(130, say.x)),
+              top: say.y,
+              '--tail': `${say.x - Math.min(window.innerWidth - 130, Math.max(130, say.x))}px`,
+            } as CSSProperties
+          }
+        >
+          <p>Thank you for the note!</p>
+        </div>
       )}
       <p className="visually-hidden" role="status">
         {said ? 'Note received, thank you!' : ''}

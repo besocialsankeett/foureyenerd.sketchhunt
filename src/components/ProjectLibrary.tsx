@@ -88,6 +88,13 @@ export default function ProjectLibrary() {
   const floorRef = useRef(floor);
   floorRef.current = floor;
   const writing = useRef(false);
+  /** A finger rather than a mouse, for how the line under the word says to move on. */
+  const [touch, setTouch] = useState(false);
+  // Arriving from "Leave a note", the view goes straight down to the shell.
+  useEffect(() => {
+    setTouch(window.matchMedia('(pointer: coarse)').matches);
+    if (new URLSearchParams(window.location.search).has('note')) setFloor(true);
+  }, []);
   const onNoteOpen = useCallback((open: boolean) => {
     writing.current = open;
   }, []);
@@ -478,6 +485,14 @@ export default function ProjectLibrary() {
         })}
       </div>
 
+      {/* Under the word: how to move on, or which project of how many this is, and what kind. */}
+      <p className="plib__caption" data-visible={!floor && focus === null} aria-live="polite">
+        {active === null
+          ? touch
+            ? 'Swipe up to browse the projects'
+            : 'Scroll to browse the projects'
+          : `${String(active + 1).padStart(2, '0')} / ${String(projects.length).padStart(2, '0')} · ${projects[active].kind}`}
+      </p>
       <button
         type="button"
         className="plib__down"

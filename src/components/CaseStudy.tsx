@@ -64,14 +64,41 @@ type Props = { project: Project; previous: Project; next: Project; from?: 'boat'
  */
 export default function CaseStudy({ project, previous, next, from = 'boat' }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
+  const book = useRef<HTMLElement>(null);
+  const progress = useRef<HTMLDivElement>(null);
   const [enlarged, setEnlarged] = useState<Picture | null>(null);
+  /** One column (a phone or a narrow window): the main picture comes first, under the title. */
+  const [narrow, setNarrow] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const query = window.matchMedia('(max-width: 820px)');
+    const update = () => setNarrow(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  // How far through the case study the reader is, as a thin line across the top.
+  useEffect(() => {
+    const scroller = book.current;
+    if (!scroller) return;
+    const update = () => {
+      const room = scroller.scrollHeight - scroller.clientHeight;
+      progress.current?.style.setProperty('--read', String(room > 0 ? scroller.scrollTop / room : 0));
+    };
+    update();
+    scroller.addEventListener('scroll', update, { passive: true });
+    return () => scroller.removeEventListener('scroll', update);
+  }, [project.slug, mounted]);
 
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
   }, [project.slug]);
 
   return (
-    <article className="book" aria-labelledby="book-title">
+    <article ref={book} className="book" aria-labelledby="book-title">
       <div className="book__title-page">
         <Link href={from === 'library' ? '/library' : '/'} scroll={false} className="book__close">
           <span aria-hidden="true">←</span> Back to the {from}
@@ -84,6 +111,7 @@ export default function CaseStudy({ project, previous, next, from = 'boat' }: Pr
           </h1>
           <p className="book__summary">{project.summary}</p>
         </header>
+        {narrow && <Figure media={project.lead} onEnlarge={setEnlarged} />}
 
         <dl className="book__facts">
           {project.facts.map((fact) => (
@@ -109,7 +137,7 @@ export default function CaseStudy({ project, previous, next, from = 'boat' }: Pr
       </div>
 
       <div className="book__work">
-        <Figure media={project.lead} onEnlarge={setEnlarged} />
+        {!narrow && <Figure media={project.lead} onEnlarge={setEnlarged} />}
 
         {project.sections.map((section) => (
           <section key={section.heading} className="book__section">
@@ -142,7 +170,17 @@ export default function CaseStudy({ project, previous, next, from = 'boat' }: Pr
         {project.gallery?.map((media) => (
           <Figure key={media.type === 'image' ? media.src : media.url} media={media} onEnlarge={setEnlarged} />
         ))}
+        {/* At the end of the work: on to the next project. */}
+        <Link href={projectPath(next)} scroll={false} className="book__next">
+          <span className="book__next-label">Next project</span>
+          <span className="book__next-title">
+            {next.title} <span aria-hidden="true">→</span>
+          </span>
+          <span className="book__next-kind">{next.kind}</span>
+        </Link>
       </div>
+      {mounted &&
+        createPortal(<div ref={progress} className="book__progress" aria-hidden="true" />, document.body)}
       {/* Outside the book, which clips and transforms what is inside it. */}
       {enlarged && createPortal(<Enlarged picture={enlarged} onClose={() => setEnlarged(null)} />, document.body)}
     </article>

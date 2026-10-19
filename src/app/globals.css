@@ -301,18 +301,33 @@ body {
 .masthead__line {
   margin: 10px 0 0;
   font-size: clamp(15px, 1.5vw, 19px);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
-  opacity: 0.85;
 }
 
-/* After dark the name is written in the colour of moonlight. */
+/* A soft halo of paper behind the words, so they read on a pink or orange sky as well. */
+.masthead {
+  text-shadow:
+    0 0 10px rgba(255, 248, 232, 0.75),
+    0 0 3px rgba(255, 248, 232, 0.6);
+}
+
+/* After dark the name is written in the colour of moonlight, with a dark halo instead. */
 html[data-mood='night'] .masthead {
   color: #fbf5e4;
+  text-shadow:
+    0 0 10px rgba(6, 18, 36, 0.7),
+    0 0 3px rgba(6, 18, 36, 0.6);
+}
+
+/* While the thank-you for a note plays, the pond is left to him. */
+html[data-thanks='true'] :is(.masthead, .tags, .socials, .to-library, .to-note, .swipe, .hint) {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* Things that belong to the surface, put away while the view is below it. */
-html[data-dive='true'] :is(.masthead, .tags, .pull, .open, .socials) {
+html[data-dive='true'] :is(.masthead, .tags, .pull, .open, .socials, .to-note) {
   opacity: 0 !important;
   pointer-events: none !important;
   transition: opacity 0.3s ease;
@@ -349,7 +364,7 @@ html[data-dive='true'] :is(.masthead, .tags, .pull, .open, .socials) {
   outline-offset: 3px;
 }
 
-html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials) {
+html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials, .to-note) {
   opacity: 0 !important;
   pointer-events: none !important;
 }
@@ -1161,15 +1176,52 @@ html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials) {
   }
 }
 
-/* Where to find him: a cream pill of outline icons beside the sound switch. */
+/* To the note shell on the pond floor: under the Project Library button. */
+.to-note {
+  position: fixed;
+  right: clamp(12px, 2.5vw, 28px);
+  top: calc(clamp(12px, 3vh, 24px) + 88px);
+  z-index: 3;
+  padding: 7px 14px;
+  border: 2px solid #4a1512;
+  border-radius: 999px;
+  background: #f8f1dd;
+  box-shadow: 0 3px 0 rgba(74, 21, 18, 0.28);
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.to-note[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.to-note:hover,
+.to-library:hover {
+  background: #fff1c9;
+}
+
+.to-note:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+/* Where to find him: a cream column of outline icons under the other controls. */
 .socials {
   position: fixed;
-  right: calc(clamp(12px, 2.5vw, 28px) + 150px);
-  top: clamp(12px, 3vh, 24px);
+  right: clamp(12px, 2.5vw, 28px);
+  top: calc(clamp(12px, 3vh, 24px) + 132px);
+  flex-direction: column;
   z-index: 3;
   display: flex;
   gap: 2px;
-  padding: 3px 6px;
+  padding: 5px 4px;
   border: 2px solid #4a1512;
   border-radius: 999px;
   background: #f8f1dd;
@@ -1188,8 +1240,8 @@ html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials) {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   color: #4a1512;
   transition:
@@ -1205,8 +1257,65 @@ html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials) {
 }
 
 .socials svg {
-  width: 17px;
-  height: 17px;
+  width: 20px;
+  height: 20px;
+}
+
+/* On a wide screen the four controls are one block of equal pills at the top right, two by
+   two: the icons and the note on the left, the sound and the library on the right. */
+@media (min-width: 601px) {
+  .sound,
+  .to-library,
+  .to-note,
+  .socials {
+    --pill-w: 150px;
+    --pill-h: 38px;
+    --gap: 8px;
+    --edge: clamp(12px, 2.5vw, 28px);
+    --top: clamp(12px, 3vh, 24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--pill-w);
+    height: var(--pill-h);
+    padding: 0 10px;
+  }
+
+  .sound,
+  .socials {
+    top: var(--top);
+  }
+
+  .to-library,
+  .to-note {
+    top: calc(var(--top) + var(--pill-h) + var(--gap));
+  }
+
+  .sound,
+  .to-library {
+    right: var(--edge);
+  }
+
+  .socials,
+  .to-note {
+    right: calc(var(--edge) + var(--pill-w) + var(--gap));
+  }
+
+  .socials {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 6px;
+  }
+
+  .socials a {
+    width: 32px;
+    height: 32px;
+  }
+
+  .socials svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 /* On a phone: a row under the name, clear of the round icons on the right. */
@@ -1215,6 +1324,37 @@ html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials) {
     left: 16px;
     right: auto;
     top: calc(max(16px, env(safe-area-inset-top)) + 86px);
+    flex-direction: row;
+    padding: 3px 6px;
+  }
+
+  .socials svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* On a phone the note shell is reached from the library; the top stays clear. */
+  .to-note {
+    display: none;
+  }
+
+  /* 7: smaller tags, so the water between them shows. */
+  .tag {
+    padding: 6px 10px 7px;
+  }
+
+  .tag__title {
+    font-size: 13.5px;
+  }
+
+  .tag__kind {
+    font-size: 9px;
+  }
+
+  /* 18: the sound switch steps aside while a case study is read. */
+  html[data-reading='true'] .sound {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .socials a {
@@ -1403,14 +1543,14 @@ html[data-page='library'] :is(.masthead, .tags, .hint, .pull, .open, .socials) {
   /* Placed by script at the top of the catch; this sets it just above, centred. */
   transform: translate(-50%, calc(-100% - 10px));
   scale: 0.6;
-  padding: 7px 16px 8px;
+  padding: 10px 22px 11px;
   border: 2px solid #4a1512;
   border-radius: 999px;
   background: #ffe566;
-  box-shadow: 0 3px 0 #4a1512;
+  box-shadow: 0 4px 0 #4a1512;
   color: #4a1512;
   font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 800;
   text-decoration: none;
   opacity: 0;
@@ -1617,6 +1757,76 @@ html[data-reading='true'] .scene {
 
 .book__section {
   margin-top: 26px;
+}
+
+/* On to the next project: a card at the end of the work. */
+.book__next {
+  display: grid;
+  gap: 4px;
+  margin-top: 34px;
+  padding: 18px 20px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: #ffe566;
+  box-shadow: 0 4px 0 var(--ink);
+  color: var(--ink);
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.book__next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--ink);
+}
+
+.book__next:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.book__next:focus-visible {
+  outline: 3px solid #4b3ff6;
+  outline-offset: 3px;
+}
+
+.book__next-label,
+.book__next-kind {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.book__next-title {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+/* How far through the case study: a thin yellow line across the top of the screen. */
+.book__progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  /* Under the opening screen (12), over the book (2). */
+  z-index: 10;
+  width: 100%;
+  height: 4px;
+  background: #ffe566;
+  box-shadow: 0 1px 0 rgba(74, 21, 18, 0.5);
+  transform: scaleX(var(--read, 0));
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+/* The main picture, moved up under the title on one column, keeps clear of the facts. */
+.book__title-page > .taped,
+.book__title-page > .browser {
+  margin: 16px 0 18px;
 }
 
 .book h2 {
@@ -2003,6 +2213,53 @@ html[data-mood='night'] .cursor__bubble {
   opacity: 0;
   transform: translateY(-40vh);
   pointer-events: none;
+}
+
+/* The line under the big word: how to move on, or "02 / 05 · Brand identity". */
+.plib__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + var(--band) / 2 + var(--band-shift, 0px) + 6px);
+  z-index: 1;
+  margin: 0;
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(6, 30, 52, 0.5);
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.plib__caption[data-visible='true'] {
+  opacity: 0.9;
+}
+
+/* 13: on a phone the pictures are larger, and the one chosen grows less, so the row of five
+   still fits on one line. */
+@media (max-width: 600px) {
+  .plib__row {
+    max-width: 96%;
+  }
+
+  .plib__thumb {
+    width: 64px;
+    height: 64px;
+    padding: 4px;
+  }
+
+  .plib__thumb[data-active='true'] {
+    width: 88px;
+    height: 88px;
+  }
+
+  .plib__caption {
+    font-size: 11.5px;
+  }
 }
 
 /* The glass hint at the bottom of the library. */
@@ -2643,4 +2900,78 @@ html[data-mood='night'] .cursor__bubble {
     inset 0 0 10px rgba(255, 255, 255, 0.35),
     0 0 14px rgba(200, 235, 255, 0.35);
   pointer-events: none;
+}
+
+/* What he says after a note: a comic speech bubble over his head, in the page's own paper,
+   ink and lettering, its tail pointing down at him. */
+.thanks__say {
+  position: fixed;
+  z-index: 6;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.thanks__say p {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  margin: 0;
+  padding: 10px 18px 11px;
+  border: 2.5px solid #4a1512;
+  border-radius: 22px;
+  background: #fff8e6;
+  box-shadow: 0 4px 0 rgba(74, 21, 18, 0.28);
+  color: #4a1512;
+  font-family: var(--font-ui), ui-rounded, system-ui, sans-serif;
+  font-size: clamp(15px, 1.6vw, 19px);
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  translate: -50% 0;
+  transform-origin: calc(50% + var(--tail, 0px)) 140%;
+  animation:
+    thanks-say-in 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both,
+    thanks-say-wobble 1.4s ease-in-out 0.5s 2,
+    thanks-say-out 0.3s ease-in 3.1s forwards;
+}
+
+/* The tail: a little ink-edged wedge pointing down at his head. */
+.thanks__say p::after {
+  content: '';
+  position: absolute;
+  left: calc(50% + var(--tail, 0px) - 8px);
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  border-right: 2.5px solid #4a1512;
+  border-bottom: 2.5px solid #4a1512;
+  background: #fff8e6;
+  transform: rotate(45deg);
+}
+
+@keyframes thanks-say-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes thanks-say-wobble {
+  50% {
+    transform: rotate(-2deg) scale(1.03);
+  }
+}
+
+@keyframes thanks-say-out {
+  to {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thanks__say p {
+    animation: none;
+  }
 }

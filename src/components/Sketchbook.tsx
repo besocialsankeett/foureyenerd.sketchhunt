@@ -52,7 +52,7 @@ const ICONS: Record<string, React.ReactNode> = {
 function hintFor(phase: Phase, caught: number | null, tossable: boolean) {
   if (phase === 'waiting') return 'Wait for a bite';
   if (phase !== 'idle') return null;
-  if (caught === null) return 'Pick a tag to go fishing, or scroll down for the project library';
+  if (caught === null) return 'Pick a tag to fish one out';
   return tossable ? 'Click the water to throw it back' : `You caught ${pondProjects[caught].title}. Open it up.`;
 }
 
@@ -403,6 +403,9 @@ export default function Sketchbook() {
           <path d="M10 43q5-4 10 0t9 0M35 43q5-4 10 0t9 0" fill="none" stroke="#3f8fc4" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
         </svg>
         <span className="to-library__label">Project Library</span>
+      </Link>
+      <Link href="/library?note" scroll={false} className="to-note" data-visible={ready && reading < 0 && !browsing}>
+        Leave a note
       </Link>
       {/* On a phone, in place of the help line: an invitation to swipe down into the water. */}
       <Link

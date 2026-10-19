@@ -555,6 +555,17 @@ export class Engine {
   }
 
   /** Where on the screen, at the surface, the thank-you bubble pops: just past the boat's bow. */
+  /** Where on the screen the top of his head is, for him to say something from. */
+  speechPoint() {
+    if (!this.boat || !this.puppet) return null;
+    const { x, y } = this.puppet.headTop(this.boat);
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      x: rect.left + ((x - this.view.left) / this.view.width) * rect.width,
+      y: rect.top + (1 - (y - this.view.bottom) / this.view.height) * rect.height,
+    };
+  }
+
   thanksPoint() {
     const boat = this.boat;
     if (!boat) return null;
